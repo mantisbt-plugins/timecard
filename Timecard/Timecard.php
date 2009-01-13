@@ -27,6 +27,10 @@ class TimecardPlugin extends MantisPlugin {
 		$this->url			= 'http://leetcode.net';
 	}
 
+	function init() {
+		require_once( 'Timecard.API.php' );
+	}
+
 	function config() {
 		return array(
 			'manage_threshold' => ADMINISTRATOR,
