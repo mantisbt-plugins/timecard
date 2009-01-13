@@ -35,6 +35,58 @@ class TimecardBug {
 		$this->timecard = $p_timecard;
 		$this->estimate = $p_estimate < 0 ? 0 : $p_estimate;
 	}
+
+	/**
+	 * Load an existing TimecardBug object from the database.
+	 * @param int Bug ID
+	 * @return object TimecardBug object
+	 */
+	static function load( $p_bug_id ) {
+		$t_estimate_table = plugin_table( 'estimate' );
+
+		$t_query = "SELECT * FROM $t_estimate_table WHERE bug_id=" . db_param();
+		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
+
+		if ( db_num_rows( $t_result ) < 1 ) {
+			trigger_error( ERROR_GENERIC, ERROR );
+			return null;
+		}
+
+		$t_row = db_fetch_array( $t_result );
+		$t_estimate = new TimecardBug( $t_row['bug_id'], $t_row['timecard'], $t_row['estimate'] );
+		$t_estimate->new = false;
+
+		return $t_estimate;
+	}
+
+	/**
+	 * Save a TimecardBug object to the database.
+	 */
+	function save() {
+		$t_estimate_table = plugin_table( 'estimate' );
+
+		if ( $this->new ) {
+			$t_query = "INSERT INTO $t_estimate_table ( bug_id, timecard, estimate ) VALUES (
+				" . db_param() . ',
+				' . db_param() . ',
+				' . db_param() . ' )';
+			db_query_bound( $t_query, array(
+				$this->bug_id,
+				$this->timecard,
+				$this->estimate,
+			) );
+		} else {
+			$t_query = "UPDATE $t_estimate_table SET
+				timecard=" . db_param() . ',
+				estimate=' . db_param() . '
+				WHERE bug_id=' . db_param();
+			db_query_bound( $t_query, array(
+				$this->timecard,
+				$this->estimate,
+				$this->bug_id,
+			) );
+		}
+	}
 }
 
 /**
