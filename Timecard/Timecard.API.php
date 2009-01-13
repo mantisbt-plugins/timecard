@@ -42,8 +42,7 @@ class TimecardBug {
  * and the associated bugnote.
  */
 class TimecardUpdate {
-	private $new = true;
-
+	public $id;
 	public $bug_id;
 	public $bugnote_id;
 	public $user_id;
@@ -58,10 +57,107 @@ class TimecardUpdate {
 	 * @param int Hours spent
 	 */
 	function __construct( $p_bug_id, $p_bugnote_id, $p_user_id, $spent=0 ) {
+		$this->id = 0;
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
 		$this->bugnote_id = $p_bugnote_id < 0 ? 0 : $p_bugnote_id;
 		$this->user_id = $p_user_id < 0 ? 0 : $p_user_id;
 		$this->spent = $p_spent < 0 ? 0 : $p_spent;
+	}
+
+	/**
+	 * Load an existing TimecardUpdate object from the database.
+	 * @param int Update ID
+	 * @return object TimecardUpdate object
+	 */
+	static function load( $p_id ) {
+		$t_update_table = plugin_table( 'update', 'Timecard' );
+
+		$t_query = "SELECT * FROM $t_update_table WHERE id=" . db_param();
+		$t_result = db_query_bound( $t_query, array( $p_id ) );
+
+		if ( db_num_rows( $t_result ) < 1 ) {
+			trigger_error( ERROR_GENERIC, ERROR );
+			return null;
+		}
+
+		$t_row = db_fetch_array( $t_result );
+		$t_update = new TimecardUpdate( $t_row['bug_id'], $t_row['bugnote_id'], $t_row['user_id'], $t_row['spent'] );
+		$t_update->id = $t_row['id'];
+		$t_update->timestamp = $t_row['timestamp'];
+
+		return $t_update;
+	}
+
+	/**
+	 * Load all existing TimecardUpdates object from the database for a specific bug.
+	 * @param int Bug ID
+	 * @return array TimecardUpdate objects
+	 */
+	static function load_by_bug( $p_bug_id ) {
+		$t_update_table = plugin_table( 'update', 'Timecard' );
+
+		$t_query = "SELECT * FROM $t_update_table WHERE bug_id=" . db_param();
+		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
+
+		$t_updates = array();
+		while ( $t_row = db_fetch_array( $t_result ) ) {
+			$t_update = new TimecardUpdate( $t_row['bug_id'], $t_row['bugnote_id'], $t_row['user_id'], $t_row['spent'] );
+			$t_update->id = $t_row['id'];
+			$t_update->timestamp = $t_row['timestamp'];
+
+			$t_updates[] = $t_update;
+		}
+
+		return $t_updates;
+	}
+
+	/**
+	 * Save a TimecardUpdate object to the database.
+	 */
+	function save() {
+		$t_update_table = plugin_table( 'update', 'Timecard' );
+
+		if ( $this->id < 1 ) { #new
+			$t_query = "INSERT INTO $t_update_table (
+					bug_id,
+					bugnote_id,
+					user_id,
+					timestamp,
+					spent
+				) VALUES (
+					" . db_param() . ',
+					' . db_param() . ',
+					' . db_param() . ',
+					' . db_param() . ',
+					' . db_param() . ' )';
+
+			db_query_bound( $t_query, array(
+				$this->bug_id,
+				$this->bugnote_id,
+				$this->user_id,
+				$this->timestamp,
+				$this->spent,
+				) );
+
+			$this->id = db_insert_id( $t_update_table );
+		} else { #existing
+			$t_query = "UPDATE $t_update_table SET
+					bug_id=" . db_param() . ',
+					bugnote_id=' . db_param() . ',
+					user_id=' . db_param() . ',
+					timestamp=' . db_param() . ',
+					spent=' . db_param() . '
+				WHERE id=' . db_param();
+
+			db_query_bound( $t_query, array(
+				$this->bug_id,
+				$this->bugnote_id,
+				$this->user_id,
+				$this->timestamp,
+				$this->spent,
+				$this->id,
+				) );
+		}
 	}
 }
 
@@ -91,7 +187,7 @@ class TimecardProject {
 	 * @return object TimecardProject object
 	 */
 	static function load( $p_project_id ) {
-		$t_project_table = plugin_table( 'project' );
+		$t_project_table = plugin_table( 'project', 'Timecard' );
 
 		$t_query = "SELECT * FROM $t_project_table WHERE project_id=" . db_param();
 		$t_result = db_query_bound( $t_query, array( $p_project_id ) );
@@ -111,7 +207,7 @@ class TimecardProject {
 	 * Save a TimecardProject object to the database.
 	 */
 	function save() {
-		$t_project_table = plugin_table( 'project' );
+		$t_project_table = plugin_table( 'project', 'Timecard' );
 
 		if ( $this->new ) {
 			$t_query = "INSERT INTO $t_project_table ( project_id, timecard ) VALUES ( " . db_param() . ', ' . db_param() . ')';
