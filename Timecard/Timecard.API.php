@@ -86,7 +86,7 @@ class TimecardProject {
 	function save() {
 		$t_project_table = plugin_table( 'project' );
 
-		if ( $new ) {
+		if ( $this->new ) {
 			$t_query = "INSERT INTO $t_project_table ( project_id, timecard ) VALUES ( " . db_param() . ', ' . db_param() . ')';
 			db_query_bound( $t_query, array( $this->project_id, $this->timecard ) );
 		} else {

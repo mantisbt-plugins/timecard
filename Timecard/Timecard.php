@@ -42,7 +42,7 @@ class TimecardPlugin extends MantisPlugin {
 	function hooks() {
 		$t_events = array();
 
-		if ( ON == plugin_config_get( 'use_timecard_number' ) ) {
+		if ( ON == plugin_config_get( 'use_timecard_number', null, true ) ) {
 			$t_events['EVENT_MANAGE_PROJECT_CREATE_FORM'] = 'project_create_form';
 			$t_events['EVENT_MANAGE_PROJECT_CREATE'] = 'project_create';
 			$t_events['EVENT_MANAGE_PROJECT_UPDATE_FORM'] = 'project_update_form';
@@ -73,22 +73,22 @@ class TimecardPlugin extends MantisPlugin {
 	function schema() {
 		return array(
 			# 2009-01-09 0.9.0
-			array( 'CreateTableSQL', array( plugin_table( 'project' ), '
+			array( 'CreateTableSQL', array( plugin_table( 'project' ), "
 				project_id		I		NOTNULL UNSIGNED PRIMARY,
 				timecard		C(64)	NOTNULL DEFAULT \" '' \"
-				' ) ),
-			array( 'CreateTableSQL', array( plugin_table( 'estimate' ), '
+				" ) ),
+			array( 'CreateTableSQL', array( plugin_table( 'estimate' ), "
 				bug_id			I		NOTNULL UNSIGNED PRIMARY,
 				timecard		C(64)	NOTNULL DEFAULT \" '' \",
 				estimate		I		NOTNULL UNSIGNED DEFAULT '0'
-				' ) ),
-			array( 'CreateTableSQL', array( plugin_table( 'update' ), '
+				" ) ),
+			array( 'CreateTableSQL', array( plugin_table( 'update' ), "
 				bug_id			I		NOTNULL UNSIGNED,
 				bugnote_id		I		NOTNULL UNSIGNED,
 				user_id			I		NOTNULL UNSIGNED,
 				timestamp		T		NOTNULL,
 				spent			I		NOTNULL UNSIGNED
-				' ) ),
+				" ) ),
 		);
 	}
 }
