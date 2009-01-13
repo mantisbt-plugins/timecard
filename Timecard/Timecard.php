@@ -27,49 +27,78 @@ class TimecardPlugin extends MantisPlugin {
 		$this->url			= 'http://leetcode.net';
 	}
 
+	/**
+	 * Load the Timecard API.
+	 */
 	function init() {
 		require_once( 'Timecard.API.php' );
 	}
 
+	/**
+	 * Plugin configuration
+	 */
 	function config() {
 		return array(
 			'manage_threshold' => ADMINISTRATOR,
 
-			'use_timecard_number' => OFF,
+			'use_timecard' => OFF,
 		);
 	}
 
+	/**
+	 * Event hooks.
+	 */
 	function hooks() {
-		$t_events = array();
+		return array(
+			'EVENT_MANAGE_PROJECT_CREATE_FORM' => 'project_create_form',
+			'EVENT_MANAGE_PROJECT_CREATE' => 'project_update',
+			'EVENT_MANAGE_PROJECT_UPDATE_FORM' => 'project_update_form',
+			'EVENT_MANAGE_PROJECT_UPDATE' => 'project_update',
+		);
+	}
 
-		if ( ON == plugin_config_get( 'use_timecard_number', null, true ) ) {
-			$t_events['EVENT_MANAGE_PROJECT_CREATE_FORM'] = 'project_create_form';
-			$t_events['EVENT_MANAGE_PROJECT_CREATE'] = 'project_create';
-			$t_events['EVENT_MANAGE_PROJECT_UPDATE_FORM'] = 'project_update_form';
-			$t_events['EVENT_MANAGE_PROJECT_UPDATE'] = 'project_update';
+	/**
+	 * When creating a project, optionally show a form element for the
+	 * project's default timecard string.
+	 */
+	function project_create_form( $p_event ) {
+		if ( plugin_config_get( 'use_timecard' ) ) {
+			echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'default_timecard' ),
+				'</td><td><input name="plugin_timecard" size="15" maxlength="64"/></td></tr>';
 		}
-
-		return $t_events;
 	}
 
-	function project_create_form() {
-		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'default_timecard_number' ),
-			'</td><td><input name="plugin_Timecard_number" size="15" maxlength="64"/></td></tr>';
+	/**
+	 * When updating a project, optionally show a form element for the
+	 * project's default timecard string.
+	 */
+	function project_update_form( $p_event, $p_project_id ) {
+		if ( plugin_config_get( 'use_timecard' ) ) {
+			$t_project = TimecardProject::load( $p_project_id );
+			echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'default_timecard' ),
+				'</td><td><input name="plugin_timecard" size="15" maxlength="64" value="', $t_project->timecard,'"/></td></tr>';
+		}
 	}
 
-	function project_update_form( $p_project_id ) {
-		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'default_timecard_number' ),
-			'</td><td><input name="plugin_Timecard_number" size="15" maxlength="64"/></td></tr>';
+	/**
+	 * When creating or updating a project, save the given default timecard
+	 * string to the database.
+	 */
+	function project_update( $p_event, $p_project_id ) {
+		if ( plugin_config_get( 'use_timecard' ) ) {
+			$f_timecard = trim( gpc_get_string( 'plugin_timecard', '' ) );
+			$t_project = TimecardProject::load( $p_project_id );
+
+			if ( $t_project->timecard != $f_timecard ) {
+				$t_project->timecard = $f_timecard;
+				$t_project->save();
+			}
+		}
 	}
 
-	function project_create( $p_project_id ) {
-		$f_default_number = gpc_get_string( 'plugin_Timecard_number', '' );
-	}
-
-	function project_update( $p_project_id ) {
-		$f_default_number = gpc_get_string( 'plugin_Timecard_number', '' );
-	}
-
+	/**
+	 * Plugin schema.
+	 */
 	function schema() {
 		return array(
 			# 2009-01-09 0.9.0

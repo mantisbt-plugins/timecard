@@ -15,6 +15,6 @@ $s_plugin_Timecard_ = '';
 $s_plugin_Timecard_title = 'Timecard';
 $s_plugin_Timecard_description = 'Time tracking for issues and projects in MantisBT.';
 
-$s_plugin_Timecard_default_timecard_number = 'Default Timecard #';
-$s_plugin_Timecard_timecard_number = 'Timecard #';
+$s_plugin_Timecard_default_timecard = 'Default Timecard';
+$s_plugin_Timecard_timecard = 'Timecard';
 
