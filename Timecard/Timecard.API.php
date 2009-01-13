@@ -19,9 +19,22 @@ class TimecardBug {
 	private $new = true;
 
 	public $bug_id;
+	public $timecard;
 	public $estimate;
 
 	public $updates;
+
+	/**
+	 * Create a new TimecardBug object.
+	 * @param int Bug ID
+	 * @param string Timecard string
+	 * @param int Estimate of hours required
+	 */
+	function __construct( $p_bug_id, $p_timecard='', $p_estimate=0 ) {
+		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
+		$this->timecard = $p_timecard;
+		$this->estimate = $p_estimate < 0 ? 0 : $p_estimate;
+	}
 }
 
 /**
@@ -36,6 +49,20 @@ class TimecardUpdate {
 	public $user_id;
 	public $timestamp;
 	public $spent;
+
+	/**
+	 * Create a new TimecardUpdate object.
+	 * @param int Bug ID
+	 * @param int Bugnote ID
+	 * @param int User ID
+	 * @param int Hours spent
+	 */
+	function __construct( $p_bug_id, $p_bugnote_id, $p_user_id, $spent=0 ) {
+		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
+		$this->bugnote_id = $p_bugnote_id < 0 ? 0 : $p_bugnote_id;
+		$this->user_id = $p_user_id < 0 ? 0 : $p_user_id;
+		$this->spent = $p_spent < 0 ? 0 : $p_spent;
+	}
 }
 
 /**
@@ -53,7 +80,7 @@ class TimecardProject {
 	 * @param string Default timecard string
 	 */
 	function __construct( $p_project_id, $p_timecard='' ) {
-		$this->project_id = $p_project_id;
+		$this->project_id = $p_project_id < 0 ? 0 : $p_project_id;
 		$this->timecard = $p_timecard;
 	}
 
