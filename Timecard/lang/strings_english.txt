@@ -18,3 +18,13 @@ $s_plugin_Timecard_description = 'Time tracking for issues and projects in Manti
 $s_plugin_Timecard_default_timecard = 'Default Timecard';
 $s_plugin_Timecard_timecard = 'Timecard';
 
+$s_plugin_Timecard_update = 'Update';
+
+$s_plugin_Timecard_configuration = 'Configuration';
+$s_plugin_Timecard_view_threshold = 'View Threshold';
+$s_plugin_Timecard_estimate_threshold = 'Estimate Threshold';
+$s_plugin_Timecard_update_threshold = 'Update Threshold';
+$s_plugin_Timecard_manage_threshold = 'Manage Threshold';
+$s_plugin_Timecard_enabled_features = 'Enabled Features';
+$s_plugin_Timecard_use_timecard = 'Timecard Strings';
+

@@ -16,6 +16,7 @@ class TimecardPlugin extends MantisPlugin {
 	function register() {
 		$this->name = plugin_lang_get( 'title' );
 		$this->description = plugin_lang_get( 'description' );
+		$this->page = 'config_page';
 
 		$this->version = '0.9.0';
 		$this->requires		= array(
@@ -39,6 +40,9 @@ class TimecardPlugin extends MantisPlugin {
 	 */
 	function config() {
 		return array(
+			'view_threshold' => VIEWER,
+			'estimate_threshold' => DEVELOPER,
+			'update_threshold' => DEVELOPER,
 			'manage_threshold' => ADMINISTRATOR,
 
 			'use_timecard' => OFF,
