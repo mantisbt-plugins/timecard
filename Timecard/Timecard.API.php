@@ -23,6 +23,7 @@ class TimecardBug {
 	public $estimate;
 
 	public $updates;
+	public $spent;
 
 	/**
 	 * Create a new TimecardBug object.
@@ -59,10 +60,19 @@ class TimecardBug {
 		$t_estimate->new = false;
 
 		if ( $p_load_updates ) {
-			$t_estimate->updates = TimecardUpdate::load_by_bug( $t_estimate->bug_id );
+			$this->load_updates();
 		}
 
 		return $t_estimate;
+	}
+
+	/**
+	 * Load child update objects.
+	 */
+	function load_updates() {
+		if ( empty( $this->updates ) ) {
+			$this->updates = TimecardUpdate::load_by_bug( $t_estimate->bug_id );
+		}
 	}
 
 	/**
@@ -99,6 +109,19 @@ class TimecardBug {
 			}
 		}
 	}
+
+	/**
+	 * Generate the appropriate 'spent' hours from child updates.
+	 */
+	function calculate() {
+		$this->load_updates();
+
+		$this->spent = 0;
+		foreach ( $this->updates as $t_update ) {
+			$this->spent += $t_update->spent;
+		}
+	}
+
 }
 
 /**
