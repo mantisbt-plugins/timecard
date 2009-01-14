@@ -34,6 +34,8 @@ class TimecardBug {
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
 		$this->timecard = $p_timecard;
 		$this->estimate = $p_estimate < 0 ? 0 : $p_estimate;
+
+		$this->updates = array();
 	}
 
 	/**
@@ -41,7 +43,7 @@ class TimecardBug {
 	 * @param int Bug ID
 	 * @return object TimecardBug object
 	 */
-	static function load( $p_bug_id ) {
+	static function load( $p_bug_id, $p_load_updates=true ) {
 		$t_estimate_table = plugin_table( 'estimate' );
 
 		$t_query = "SELECT * FROM $t_estimate_table WHERE bug_id=" . db_param();
@@ -55,6 +57,10 @@ class TimecardBug {
 		$t_row = db_fetch_array( $t_result );
 		$t_estimate = new TimecardBug( $t_row['bug_id'], $t_row['timecard'], $t_row['estimate'] );
 		$t_estimate->new = false;
+
+		if ( $p_load_updates ) {
+			$t_estimate->updates = TimecardUpdate::load_by_bug( $t_estimate->bug_id );
+		}
 
 		return $t_estimate;
 	}
@@ -85,6 +91,12 @@ class TimecardBug {
 				$this->estimate,
 				$this->bug_id,
 			) );
+		}
+
+		foreach ( $this->updates as $t_update ) {
+			if ( $t_update->id == 0 ) {
+				$t_update->save();
+			}
 		}
 	}
 }
