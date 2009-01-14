@@ -60,7 +60,39 @@ class TimecardBug {
 		$t_estimate->new = false;
 
 		if ( $p_load_updates ) {
-			$this->load_updates();
+			$t_esitmate->load_updates();
+		}
+
+		return $t_estimate;
+	}
+
+	/**
+	 * Load existing TimecardBug objects from the database for a given project.
+	 * @param int Project ID
+	 * @param boolean Load TimecardUpdate objects
+	 * @return array TimecardBug objects
+	 */
+	static function load_by_project( $p_project_id, $p_load_updates=true ) {
+		if ( $p_load_updates ) {
+			$t_updates = TimecardUpdate::load_by_project( $p_project_id );
+		} else {
+			$t_updates = array();
+		}
+
+		$t_bug_table = db_get_table( 'mantis_bug_table' );
+		$t_estimate_table = plugin_table( 'estimate' );
+
+		$t_query = "SELECT * FROM $t_estimate_table WHERE bug_id IN ( SELECT id FROM $t_bug_table WHERE project_id=" . db_param() . ')';
+		$t_result = db_query_bound( $t_query, array( $p_project_id ) );
+
+		$t_estimates = array();
+		while ( $t_row = db_fetch_array( $t_result ) ) {
+			$t_estimate = new TimecardBug( $t_row['bug_id'], $t_row['timecard'], $t_row['estimate'] );
+			$t_estimate->new = false;
+
+			if ( $p_load_updates && isset( $t_updates[ $t_row['bug_id'] ] ) ) {
+				$t_estimate->updates = $t_updates[ $t_row['bug_id'] ];
+			}
 		}
 
 		return $t_estimate;
@@ -199,6 +231,34 @@ class TimecardUpdate {
 	}
 
 	/**
+	 * Load all existing TimecardUpdate objects from the database for a specific project.
+	 * @param int project_id
+	 * @return array TimecardUpdate objects in 2D array by bug ID
+	 */
+	static function load_by_project( $p_project_id ) {
+		$t_bug_table = db_get_table( 'mantis_bug_table' );
+		$t_update_table = plugin_table( 'update', 'Timecard' );
+
+		$t_query = "SELECT * FROM $t_update_table WHERE bug_id IN ( SELECT bug_id FROM $t_bug_table WHERE project_id=" . db_param() . ' )';
+		$t_result = db_query_bound( $t_query, array( $p_project_id ) );
+
+		$t_updates = array();
+		while ( $t_row = db_fetch_array( $t_result ) ) {
+			$t_update = new TimecardUpdate( $t_row['bug_id'], $t_row['bugnote_id'], $t_row['user_id'], $t_row['spent'] );
+			$t_update->id = $t_row['id'];
+			$t_update->timestamp = $t_row['timestamp'];
+
+			if ( !isset( $t_updates[ $t_row['bug_id'] ] ) ) {
+				$t_updates[ $t_row['bug_id'] ] = array();
+			}
+
+			$t_updates[ $t_row['bug_id'] ][] = $t_update;
+		}
+
+		return $t_updates;
+	}
+
+	/**
 	 * Save a TimecardUpdate object to the database.
 	 */
 	function save() {
@@ -257,6 +317,8 @@ class TimecardProject {
 	public $project_id;
 	public $timecard;
 
+	public $bugs;
+
 	/**
 	 * Create a new TimecardProject object.
 	 * @param int Project ID
@@ -265,15 +327,18 @@ class TimecardProject {
 	function __construct( $p_project_id, $p_timecard='' ) {
 		$this->project_id = $p_project_id < 0 ? 0 : $p_project_id;
 		$this->timecard = $p_timecard;
+
+		$this->bugs = array();
 	}
 
 	/**
 	 * Load an existing TimecardProject object from the database, or generate
 	 * a new object when one doesn't exist.
 	 * @param int Project ID
+	 * @param boolean Load TimecardBug objects
 	 * @return object TimecardProject object
 	 */
-	static function load( $p_project_id ) {
+	static function load( $p_project_id, $p_load_bugs=true ) {
 		$t_project_table = plugin_table( 'project', 'Timecard' );
 
 		$t_query = "SELECT * FROM $t_project_table WHERE project_id=" . db_param();
@@ -287,7 +352,21 @@ class TimecardProject {
 		$t_project = new TimecardProject( $t_row['project_id'], $t_row['timecard'] );
 		$t_project->new = false;
 
+		if ( $p_load_bugs ) {
+			$t_project->load_bugs( $p_load_bugs );
+		}
+
 		return $t_project;
+	}
+
+	/**
+	 * Load child TimecardBug objects.
+	 * @param boolean Load TimecardUpdate objects
+	 */
+	function load_bugs( $p_load_updates=true ) {
+		if ( empty( $this->bugs ) ) {
+			$this->bugs = TimecardBug::load_by_project( $this->project_id, $p_load_updates );
+		}
 	}
 
 	/**
