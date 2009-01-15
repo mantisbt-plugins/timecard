@@ -51,8 +51,8 @@ class TimecardBug {
 		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
-			trigger_error( ERROR_GENERIC, ERROR );
-			return null;
+			$t_project = TimecardProject::load( bug_get_field( $p_bug_id, 'project_id' ) );
+			return new TimecardBug( $p_bug_id, $t_project->timecard, 0 );
 		}
 
 		$t_row = db_fetch_array( $t_result );
@@ -60,7 +60,7 @@ class TimecardBug {
 		$t_estimate->new = false;
 
 		if ( $p_load_updates ) {
-			$t_esitmate->load_updates();
+			$t_estimate->load_updates();
 		}
 
 		return $t_estimate;
@@ -103,7 +103,7 @@ class TimecardBug {
 	 */
 	function load_updates() {
 		if ( empty( $this->updates ) ) {
-			$this->updates = TimecardUpdate::load_by_bug( $t_estimate->bug_id );
+			$this->updates = TimecardUpdate::load_by_bug( $this->bug_id );
 		}
 	}
 
@@ -338,7 +338,7 @@ class TimecardProject {
 	 * @param boolean Load TimecardBug objects
 	 * @return object TimecardProject object
 	 */
-	static function load( $p_project_id, $p_load_bugs=true ) {
+	static function load( $p_project_id, $p_load_bugs=false ) {
 		$t_project_table = plugin_table( 'project', 'Timecard' );
 
 		$t_query = "SELECT * FROM $t_project_table WHERE project_id=" . db_param();
@@ -363,7 +363,7 @@ class TimecardProject {
 	 * Load child TimecardBug objects.
 	 * @param boolean Load TimecardUpdate objects
 	 */
-	function load_bugs( $p_load_updates=true ) {
+	function load_bugs( $p_load_updates=false ) {
 		if ( empty( $this->bugs ) ) {
 			$this->bugs = TimecardBug::load_by_project( $this->project_id, $p_load_updates );
 		}
