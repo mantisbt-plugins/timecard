@@ -17,6 +17,10 @@ $s_plugin_Timecard_description = 'Time tracking for issues and projects in Manti
 
 $s_plugin_Timecard_default_timecard = 'Default Timecard';
 $s_plugin_Timecard_timecard = 'Timecard';
+$s_plugin_Timecard_estimate = 'Time Estimate';
+$s_plugin_Timecard_estimate_hours = ' hours';
+$s_plugin_Timecard_estimate_zero = '0 hours';
+$s_plugin_Timecard_estimate_display = '%d hours total ( %d remaining )';
 
 $s_plugin_Timecard_update = 'Update';
 
