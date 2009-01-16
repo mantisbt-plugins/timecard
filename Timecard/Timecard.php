@@ -74,6 +74,10 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param boolean Advanced view
 	 */
 	function report_bug_form( $p_event, $p_project_id, $p_advanced ) {
+		if ( !access_has_project_level( plugin_config_get( 'estimate_threshold' ), $p_project_id ) ) {
+			return;
+		}
+
 		if ( plugin_config_get( 'use_timecard' ) ) {
 			$t_project = TimecardProject::load( $p_project_id );
 
@@ -93,6 +97,10 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bug ID
 	 */
 	function report_bug( $p_event, $p_data, $p_bug_id ) {
+		if ( !access_has_project_level( plugin_config_get( 'estimate_threshold' ), $p_project_id ) ) {
+			return;
+		}
+
 		$t_bug = new TimecardBug( $p_bug_id );
 		$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
 
@@ -110,6 +118,10 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param boolean Advanced view
 	 */
 	function update_bug_form( $p_event, $p_bug_id, $p_advanced ) {
+		if ( !access_has_project_level( plugin_config_get( 'estimate_threshold' ), $p_project_id ) ) {
+			return;
+		}
+
 		$t_bug = TimecardBug::load( $p_bug_id, true );
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
@@ -134,6 +146,10 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bug ID
 	 */
 	function update_bug( $p_event, $p_data, $p_bug_id ) {
+		if ( !access_has_project_level( plugin_config_get( 'estimate_threshold' ), $p_project_id ) ) {
+			return;
+		}
+
 		$t_bug = TimecardBug::load( $p_bug_id, true );
 		$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
 
@@ -151,6 +167,10 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param boolean Advanced view
 	 */
 	function view_bug( $p_event, $p_bug_id, $p_advanced ) {
+		if ( !access_has_project_level( plugin_config_get( 'view_threshold' ), $p_project_id ) ) {
+			return;
+		}
+
 		$t_bug = TimecardBug::load( $p_bug_id, true );
 		$t_bug->calculate();
 
