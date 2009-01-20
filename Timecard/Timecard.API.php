@@ -125,8 +125,8 @@ class TimecardBug {
 				$this->estimate,
 			) );
 
-			plugin_history_log( $this->bug_id, 'timecard_added', '', $this->timecard, null, 'Timecard' );
-			plugin_history_log( $this->bug_id, 'estimate_added', '', $this->estimate . $t_hours, null, 'Timecard' );
+			plugin_history_log( $this->bug_id, 'timecard_added', $this->timecard, '', null, 'Timecard' );
+			plugin_history_log( $this->bug_id, 'estimate_added', $this->estimate . $t_hours, '', null, 'Timecard' );
 		} else {
 			$t_query = "UPDATE $t_estimate_table SET
 				timecard=" . db_param() . ',
@@ -326,7 +326,7 @@ class TimecardUpdate {
 
 			$this->id = db_insert_id( $t_update_table );
 
-			plugin_history_log( $this->bug_id, 'time_spent_added', '', $this->spent . $t_hours, null, 'Timecard' );
+			plugin_history_log( $this->bug_id, 'time_spent_added', $this->spent . $t_hours, '', null, 'Timecard' );
 
 		} else { #existing
 			$t_query = "UPDATE $t_update_table SET
