@@ -195,7 +195,11 @@ class TimecardPlugin extends MantisPlugin {
 
 		if ( $t_bug->estimate > 0 ) {
 			$t_bug->calculate();
-			echo sprintf( plugin_lang_get( 'estimate_display' ), $t_bug->estimate, $t_bug->estimate - $t_bug->spent );
+			if ( $t_bug->spent > $t_bug->estimate ) {
+				echo sprintf( plugin_lang_get( 'estimate_over' ), $t_bug->estimate, $t_bug->spent - $t_bug->estimate );
+			} else {
+				echo sprintf( plugin_lang_get( 'estimate_display' ), $t_bug->estimate, $t_bug->estimate - $t_bug->spent );
+			}
 		} else {
 			echo plugin_lang_get( 'estimate_zero' );
 		}
