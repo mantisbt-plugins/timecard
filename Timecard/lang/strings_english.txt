@@ -16,14 +16,12 @@ $s_plugin_Timecard_title = 'Timecard';
 $s_plugin_Timecard_description = 'Time tracking for issues and projects in MantisBT.';
 
 $s_plugin_Timecard_hours = ' hours';
-
 $s_plugin_Timecard_default_timecard = 'Default Timecard';
 $s_plugin_Timecard_timecard = 'Timecard';
 $s_plugin_Timecard_estimate = 'Time Estimate';
-$s_plugin_Timecard_estimate_zero = '0 hours';
+$s_plugin_Timecard_estimate_zero = 'No estimate';
 $s_plugin_Timecard_estimate_display = '%d hours total (%d hours remaining)';
 $s_plugin_Timecard_estimate_over = '%d hours total (<span class="negative">%d hours overrun</span>)';
-
 $s_plugin_Timecard_time_spent = 'Time Spent';
 
 $s_plugin_Timecard_update = 'Update';
@@ -35,4 +33,13 @@ $s_plugin_Timecard_update_threshold = 'Update Threshold';
 $s_plugin_Timecard_manage_threshold = 'Manage Threshold';
 $s_plugin_Timecard_enabled_features = 'Enabled Features';
 $s_plugin_Timecard_use_timecard = 'Timecard Strings';
+
+$s_plugin_Timecard_timecard_added = 'Timecard Added';
+$s_plugin_Timecard_timecard_updated = 'Timecard Updated';
+$s_plugin_Timecard_estimate_added = 'Time Estimate Added';
+$s_plugin_Timecard_estimate_updated = 'Time Estimate Updated';
+$s_plugin_Timecard_estimate_removed = 'Time Estimate Removed';
+$s_plugin_Timecard_time_spent_added = 'Time Spent Added';
+$s_plugin_Timecard_time_spent_updated = 'Time Spent Updated';
+$s_plugin_Timecard_time_spent_removed = 'Time Spent Removed';
 

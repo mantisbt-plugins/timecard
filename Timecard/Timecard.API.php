@@ -33,8 +33,8 @@ class TimecardBug {
 	 */
 	function __construct( $p_bug_id, $p_timecard='', $p_estimate=0 ) {
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
-		$this->timecard = $p_timecard;
-		$this->estimate = $p_estimate < 0 ? 0 : $p_estimate;
+		$this->timecard = $this->__timecard = $p_timecard;
+		$this->estimate = $this->__estimate = $p_estimate < 0 ? 0 : $p_estimate;
 
 		$this->updates = array();
 	}
@@ -112,6 +112,7 @@ class TimecardBug {
 	 */
 	function save() {
 		$t_estimate_table = plugin_table( 'estimate' );
+		$t_hours = plugin_lang_get( 'hours' );
 
 		if ( $this->new ) {
 			$t_query = "INSERT INTO $t_estimate_table ( bug_id, timecard, estimate ) VALUES (
@@ -123,6 +124,9 @@ class TimecardBug {
 				$this->timecard,
 				$this->estimate,
 			) );
+
+			plugin_history_log( $this->bug_id, 'timecard_added', '', $this->timecard, null, 'Timecard' );
+			plugin_history_log( $this->bug_id, 'estimate_added', '', $this->estimate . $t_hours, null, 'Timecard' );
 		} else {
 			$t_query = "UPDATE $t_estimate_table SET
 				timecard=" . db_param() . ',
@@ -133,6 +137,15 @@ class TimecardBug {
 				$this->estimate,
 				$this->bug_id,
 			) );
+
+			if ( $this->timecard != $this->__timecard ) {
+				plugin_history_log( $this->bug_id, 'timecard_updated', $this->__timecard, $this->timecard, null, 'Timecard' );
+				$this->__timecard = $this->timecard;
+			}
+			if ( $this->estimate != $this->__estimate ) {
+				plugin_history_log( $this->bug_id, 'estimate_updated', $this->__estimate . $t_hours, $this->estimate . $t_hours, null, 'Timecard' );
+				$this->__estimate = $this->estimate;
+			}
 		}
 
 		foreach ( $this->updates as $t_update ) {
@@ -180,7 +193,7 @@ class TimecardUpdate {
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
 		$this->bugnote_id = $p_bugnote_id < 0 ? 0 : $p_bugnote_id;
 		$this->user_id = $p_user_id < 0 ? 0 : $p_user_id;
-		$this->spent = $p_spent < 0 ? 0 : $p_spent;
+		$this->spent = $this->__spent = $p_spent < 0 ? 0 : $p_spent;
 		$this->timestamp = db_now();
 	}
 
@@ -287,6 +300,7 @@ class TimecardUpdate {
 	 */
 	function save() {
 		$t_update_table = plugin_table( 'update', 'Timecard' );
+		$t_hours = plugin_lang_get( 'hours' );
 
 		if ( $this->id < 1 ) { #new
 			$t_query = "INSERT INTO $t_update_table (
@@ -311,6 +325,9 @@ class TimecardUpdate {
 				) );
 
 			$this->id = db_insert_id( $t_update_table );
+
+			plugin_history_log( $this->bug_id, 'time_spent_added', '', $this->spent . $t_hours, null, 'Timecard' );
+
 		} else { #existing
 			$t_query = "UPDATE $t_update_table SET
 					bug_id=" . db_param() . ',
@@ -328,15 +345,22 @@ class TimecardUpdate {
 				$this->spent,
 				$this->id,
 				) );
+
+			if ( $this->spent != $this->__spent ) {
+				plugin_history_log( $this->bug_id, 'time_spent_updated', $this->__spent . $t_hours, $this->spent . $t_hours, null, 'Timecard' );
+				$this->__spent = $this->spent;
+			}
 		}
 	}
 
 	function delete() {
 		$t_update_table = plugin_table( 'update', 'Timecard' );
+		$t_hours = plugin_lang_get( 'hours' );
 
 		$t_query = "DELETE FROM $t_update_table WHERE id=" . db_param();
 		db_query_bound( $t_query, array( $this->id ) );
 
+		plugin_history_log( $this->bug_id, 'time_spent_removed', $this->__spent . $t_hours, '', null, 'Timecard' );
 		$this->id = 0;
 	}
 }
