@@ -175,12 +175,13 @@ class TimecardUpdate {
 	 * @param int User ID
 	 * @param int Hours spent
 	 */
-	function __construct( $p_bug_id, $p_bugnote_id, $p_user_id, $spent=0 ) {
+	function __construct( $p_bug_id, $p_bugnote_id, $p_user_id, $p_spent=0 ) {
 		$this->id = 0;
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
 		$this->bugnote_id = $p_bugnote_id < 0 ? 0 : $p_bugnote_id;
 		$this->user_id = $p_user_id < 0 ? 0 : $p_user_id;
 		$this->spent = $p_spent < 0 ? 0 : $p_spent;
+		$this->timestamp = db_now();
 	}
 
 	/**
@@ -228,6 +229,29 @@ class TimecardUpdate {
 		}
 
 		return $t_updates;
+	}
+
+	/**
+	 * Try to load an existing TimecardUpdate object for a given bugnote.
+	 * @param int Bugnote ID
+	 * @return object TimecardUpdate object, or null if not found
+	 */
+	static function load_by_bugnote( $p_bugnote_id ) {
+		$t_update_table = plugin_table( 'update', 'Timecard' );
+
+		$t_query = "SELECT * FROM $t_update_table WHERE bugnote_id=" . db_param();
+		$t_result = db_query_bound( $t_query, array( $p_bugnote_id ) );
+
+		if ( db_num_rows( $t_result ) < 1 ) {
+			return null;
+		}
+
+		$t_row = db_fetch_array( $t_result );
+		$t_update = new TimecardUpdate( $t_row['bug_id'], $t_row['bugnote_id'], $t_row['user_id'], $t_row['spent'] );
+		$t_update->id = $t_row['id'];
+		$t_update->timestamp = $t_row['timestamp'];
+
+		return $t_update;
 	}
 
 	/**
@@ -305,6 +329,15 @@ class TimecardUpdate {
 				$this->id,
 				) );
 		}
+	}
+
+	function delete() {
+		$t_update_table = plugin_table( 'update', 'Timecard' );
+
+		$t_query = "DELETE FROM $t_update_table WHERE id=" . db_param();
+		db_query_bound( $t_query, array( $this->id ) );
+
+		$this->id = 0;
 	}
 }
 
