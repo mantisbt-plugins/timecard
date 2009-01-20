@@ -381,7 +381,7 @@ class TimecardPlugin extends MantisPlugin {
 				estimate		I		NOTNULL UNSIGNED DEFAULT '0'
 				" ) ),
 			array( 'CreateTableSQL', array( plugin_table( 'update' ), "
-				id				I		NOTNULL UNSIGNED PRIMARY,
+				id				I		NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
 				bug_id			I		NOTNULL UNSIGNED,
 				bugnote_id		I		NOTNULL UNSIGNED,
 				user_id			I		NOTNULL UNSIGNED,
