@@ -87,7 +87,7 @@ class TimecardPlugin extends MantisPlugin {
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
 			'</td><td><input name="plugin_timecard_estimate" value="0" size="8" maxlength="64"/>',
-			plugin_lang_get( 'estimate_hours' ), '</td></tr>';
+			plugin_lang_get( 'hours' ), '</td></tr>';
 	}
 
 	/**
@@ -97,7 +97,7 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bug ID
 	 */
 	function report_bug( $p_event, $p_data, $p_bug_id ) {
-		if ( !access_has_project_level( plugin_config_get( 'estimate_threshold' ), $p_project_id ) ) {
+		if ( !access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 
@@ -118,7 +118,7 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param boolean Advanced view
 	 */
 	function update_bug_form( $p_event, $p_bug_id, $p_advanced ) {
-		if ( !access_has_project_level( plugin_config_get( 'estimate_threshold' ), $p_project_id ) ) {
+		if ( !access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 
@@ -126,7 +126,7 @@ class TimecardPlugin extends MantisPlugin {
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
 			'</td><td><input name="plugin_timecard_estimate" value="', $t_bug->estimate, '" size="8" maxlength="64"/>',
-			plugin_lang_get( 'estimate_hours' ), '</td>';
+			plugin_lang_get( 'hours' ), '</td>';
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
 			echo '<td class="category">', plugin_lang_get( 'timecard' ),
@@ -146,7 +146,7 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bug ID
 	 */
 	function update_bug( $p_event, $p_data, $p_bug_id ) {
-		if ( !access_has_project_level( plugin_config_get( 'estimate_threshold' ), $p_project_id ) ) {
+		if ( !access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 
@@ -167,7 +167,7 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param boolean Advanced view
 	 */
 	function view_bug( $p_event, $p_bug_id, $p_advanced ) {
-		if ( !access_has_project_level( plugin_config_get( 'view_threshold' ), $p_project_id ) ) {
+		if ( !access_has_bug_level( plugin_config_get( 'view_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 

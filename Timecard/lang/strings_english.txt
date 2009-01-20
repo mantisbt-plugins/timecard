@@ -15,10 +15,11 @@ $s_plugin_Timecard_ = '';
 $s_plugin_Timecard_title = 'Timecard';
 $s_plugin_Timecard_description = 'Time tracking for issues and projects in MantisBT.';
 
+$s_plugin_Timecard_hours = ' hours';
+
 $s_plugin_Timecard_default_timecard = 'Default Timecard';
 $s_plugin_Timecard_timecard = 'Timecard';
 $s_plugin_Timecard_estimate = 'Time Estimate';
-$s_plugin_Timecard_estimate_hours = ' hours';
 $s_plugin_Timecard_estimate_zero = '0 hours';
 $s_plugin_Timecard_estimate_display = '%d hours total ( %d remaining )';
 
