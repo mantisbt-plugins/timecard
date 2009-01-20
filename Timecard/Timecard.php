@@ -58,7 +58,15 @@ class TimecardPlugin extends MantisPlugin {
 			'EVENT_REPORT_BUG' => 'report_bug',
 			'EVENT_UPDATE_BUG_FORM' => 'update_bug_form',
 			'EVENT_UPDATE_BUG' => 'update_bug',
+
 			'EVENT_VIEW_BUG_DETAILS' => 'view_bug',
+			'EVENT_VIEW_BUGNOTES_START' => 'view_bugnotes_start',
+			'EVENT_VIEW_BUGNOTE' => 'view_bugnote',
+
+			'EVENT_BUGNOTE_ADD_FORM' => 'bugnote_add_form',
+			'EVENT_BUGNOTE_ADD' => 'bugnote_add',
+			'EVENT_BUGNOTE_EDIT_FORM' => 'bugnote_edit_form',
+			'EVENT_BUGNOTE_EDIT' => 'bugnote_edit',
 
 			'EVENT_MANAGE_PROJECT_CREATE_FORM' => 'project_create_form',
 			'EVENT_MANAGE_PROJECT_CREATE' => 'project_update',
@@ -194,6 +202,121 @@ class TimecardPlugin extends MantisPlugin {
 		}
 
 		echo '</tr>';
+	}
+
+	/**
+	 * Generate and cache a dict of TimecardUpdate objects keyed by bugnote ID.
+	 * @param string Event name
+	 * @param int Bug ID
+	 */
+	function view_bugnotes_start( $p_event, $p_bug_id ) {
+		$this->update_cache = array();
+
+		if ( !access_has_bug_level( plugin_config_get( 'view_threshold' ), $p_bug_id ) ) {
+			return;
+		}
+
+		$t_updates = TimecardUpdate::load_by_bug( $p_bug_id );
+
+		foreach( $t_updates as $t_update ) {
+			$this->update_cache[ $t_update->bugnote_id ] = $t_update;
+		}
+	}
+
+	/**
+	 * Show any available TimecardUpdate objects with their associated bugnotes.
+	 * @param string Event name
+	 * @param int Bug ID
+	 * @param int Bugnote ID
+	 * @param boolean Private note
+	 */
+	function view_bugnote( $p_event, $p_bug_id, $p_bugnote_id, $p_private ) {
+		if ( isset( $this->update_cache[ $p_bugnote_id ] ) ) {
+			$t_update = $this->update_cache[ $p_bugnote_id ];
+			$t_css = $p_private ? 'bugnote-private' : 'bugnote-public';
+			$t_css2 = $p_private ? 'bugnote-note-private' : 'bugnote-note-public';
+
+			echo '<tr class="bugnote"><td class="', $t_css, '">', plugin_lang_get( 'time_spent' ),
+				'</td><td class="', $t_css2, '">', $t_update->spent, plugin_lang_get( 'hours' ), '</td></tr>';
+		}
+	}
+
+	/**
+	 * Show appropriate forms for updating time spent.
+	 * @param string Event name
+	 * @param int Bug ID
+	 */
+	function bugnote_add_form( $p_event, $p_bug_id ) {
+		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+			return;
+		}
+
+		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'time_spent' ),
+			'</td><td><input name="plugin_timecard_spent" value="0" size="6"/>', plugin_lang_get( 'hours' ), '</td></tr>';
+	}
+
+	/**
+	 * Process form data when bugnotes are added.
+	 * @param string Event name
+	 * @param int Bug ID
+	 * @param int Bugnote ID
+	 */
+	function bugnote_add( $p_event, $p_bug_id, $p_bugnote_id ) {
+		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+			return;
+		}
+
+		$f_spent = gpc_get_int( 'plugin_timecard_spent', 0 );
+		if ( $f_spent > 0 ) {
+			$t_update = new TimecardUpdate( $p_bug_id, $p_bugnote_id, auth_get_current_user_id(), $f_spent );
+			$t_update->save();
+		}
+	}
+
+	/**
+	 * Show appropriate forms for updating time spent.
+	 * @param string Event name
+	 * @param int Bug ID
+	 * @param int Bugnote ID
+	 */
+	function bugnote_edit_form( $p_event, $p_bug_id, $p_bugnote_id ) {
+		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+			return;
+		}
+		
+		$t_update = TimecardUpdate::load_by_bugnote( $p_bugnote_id );
+		if ( $t_update != null ) {
+			echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'time_spent' ),
+				'</td><td><input type="hidden" name="plugin_timecard_id" value="', $t_update->id, '"/>',
+				'<input name="plugin_timecard_spent" value="', $t_update->spent, '" size="6"/>', plugin_lang_get( 'hours' ), '</td></tr>';
+		}
+	}
+
+	/**
+	 * Process form data when bugnotes are edited.
+	 * @param string Event name
+	 * @param int Bug ID
+	 * @param int Bugnote ID
+	 */
+	function bugnote_edit( $p_event, $p_bug_id, $p_bugnote_id ) {
+		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+			return;
+		}
+
+		$f_update_id = gpc_get_int( 'plugin_timecard_id', 0 );
+		$f_spent = gpc_get_int( 'plugin_timecard_spent', 0 );
+
+		if ( $f_update_id > 0 ) {
+			$t_update = TimecardUpdate::load( $f_update_id );
+
+			if ( $f_spent > 0 && $f_spent != $t_update->spent ) {
+				$t_update->spent = $f_spent;
+				$t_update->save();
+
+			} else if ( $f_spent === 0 ) {
+				$t_update->delete();
+			}
+		}
 	}
 
 	/**
