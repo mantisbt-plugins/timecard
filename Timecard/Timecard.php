@@ -60,6 +60,7 @@ class TimecardPlugin extends MantisPlugin {
 			'EVENT_UPDATE_BUG' => 'update_bug',
 
 			'EVENT_VIEW_BUG_DETAILS' => 'view_bug',
+			'EVENT_VIEW_BUG_EXTRA' => 'view_bug_extra',
 			'EVENT_VIEW_BUGNOTES_START' => 'view_bugnotes_start',
 			'EVENT_VIEW_BUGNOTE' => 'view_bugnote',
 
@@ -213,6 +214,21 @@ class TimecardPlugin extends MantisPlugin {
 		}
 
 		echo '</tr>';
+	}
+
+	function view_bug_extra( $p_event, $p_bug_id ) {
+		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+			return;
+		}
+
+		echo '<br/><form action="', plugin_page( 'log_time' ), '" method="post">',
+			form_security_field( 'plugin_Timecard_log_time' ),
+			'<table class="width50" cellspacing="1" align="center"><tr><td class="form-title">',
+			plugin_lang_get( 'log_time_spent' ), '</td></tr><tr ', helper_alternate_class(), '><td class="category">',
+			plugin_lang_get( 'time_spent' ), '</td><td><input type="hidden" name="bug_id" value="', $p_bug_id, '"/>',
+			'<input name="spent" value="0" size="6"/>', plugin_lang_get( 'hours' ), '</td></tr>',
+			'<tr><td class="center" colspan="2"><input type="submit" value="', plugin_lang_get( 'log_time_spent' ), '"/></td></tr>',
+			'</table></form>';
 	}
 
 	/**
