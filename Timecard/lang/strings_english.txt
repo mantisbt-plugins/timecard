@@ -21,7 +21,7 @@ $s_plugin_Timecard_default_timecard = 'Default Timecard';
 $s_plugin_Timecard_timecard = 'Timecard';
 $s_plugin_Timecard_estimate = 'Time Estimate';
 $s_plugin_Timecard_estimate_zero = '0 hours';
-$s_plugin_Timecard_estimate_display = '%d hours total ( %d remaining )';
+$s_plugin_Timecard_estimate_display = '%d hours total (%d hours remaining)';
 
 $s_plugin_Timecard_time_spent = 'Time Spent';
 

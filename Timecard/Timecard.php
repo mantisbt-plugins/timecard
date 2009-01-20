@@ -182,8 +182,16 @@ class TimecardPlugin extends MantisPlugin {
 		$t_bug = TimecardBug::load( $p_bug_id, true );
 		$t_bug->calculate();
 
-		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
-			'</td><td>';
+		$t_columns = 6;
+		echo '<tr ', helper_alternate_class(), '>';
+
+		if ( plugin_config_get( 'use_timecard' ) ) {
+			echo '<td class="category">', plugin_lang_get( 'timecard' ), '</td><td>',
+				string_display_line( $t_bug->timecard ), '</td>';
+			$t_columns -= 2;
+		}
+
+		echo '<td class="category">', plugin_lang_get( 'estimate' ), '</td><td colspan="2">';
 
 		if ( $t_bug->estimate > 0 ) {
 			$t_bug->calculate();
@@ -194,11 +202,10 @@ class TimecardPlugin extends MantisPlugin {
 
 		echo '</td>';
 
-		if ( plugin_config_get( 'use_timecard' ) ) {
-			echo '<td class="category">', plugin_lang_get( 'timecard' ), '</td><td>',
-				string_display_line( $t_bug->timecard ), '<td colspan="2"></td>';
-		} else {
-			echo '<td colspan="4"></td>';
+		$t_columns -= 3;
+
+		if ( $t_columns > 0 ) {
+			echo '<td colspan="', $t_columns, '"></td>';
 		}
 
 		echo '</tr>';
