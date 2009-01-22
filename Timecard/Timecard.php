@@ -45,6 +45,7 @@ class TimecardPlugin extends MantisPlugin {
 			'update_threshold' => DEVELOPER,
 			'manage_threshold' => ADMINISTRATOR,
 
+			'use_updates' => ON,
 			'use_timecard' => OFF,
 		);
 	}
@@ -195,11 +196,15 @@ class TimecardPlugin extends MantisPlugin {
 		echo '<td class="category">', plugin_lang_get( 'estimate' ), '</td><td colspan="2">';
 
 		if ( $t_bug->estimate > 0 ) {
-			$t_bug->calculate();
-			if ( $t_bug->spent > $t_bug->estimate ) {
-				echo sprintf( plugin_lang_get( 'estimate_over' ), $t_bug->estimate, $t_bug->spent - $t_bug->estimate );
+			if ( plugin_config_get( 'use_updates' ) ) {
+				$t_bug->calculate();
+				if ( $t_bug->spent > $t_bug->estimate ) {
+					echo sprintf( plugin_lang_get( 'estimate_over' ), $t_bug->estimate, $t_bug->spent - $t_bug->estimate );
+				} else {
+					echo sprintf( plugin_lang_get( 'estimate_display' ), $t_bug->estimate, $t_bug->estimate - $t_bug->spent );
+				}
 			} else {
-				echo sprintf( plugin_lang_get( 'estimate_display' ), $t_bug->estimate, $t_bug->estimate - $t_bug->spent );
+				echo $t_bug->estimate, plugin_lang_get( 'hours' );
 			}
 		} else {
 			echo plugin_lang_get( 'estimate_zero' );
@@ -217,7 +222,8 @@ class TimecardPlugin extends MantisPlugin {
 	}
 
 	function view_bug_extra( $p_event, $p_bug_id ) {
-		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+		if ( !plugin_config_get( 'use_updates' ) ||
+			!access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 
@@ -239,7 +245,8 @@ class TimecardPlugin extends MantisPlugin {
 	function view_bugnotes_start( $p_event, $p_bug_id ) {
 		$this->update_cache = array();
 
-		if ( !access_has_bug_level( plugin_config_get( 'view_threshold' ), $p_bug_id ) ) {
+		if ( !plugin_config_get( 'use_updates' ) ||
+			!access_has_bug_level( plugin_config_get( 'view_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 
@@ -274,7 +281,8 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bug ID
 	 */
 	function bugnote_add_form( $p_event, $p_bug_id ) {
-		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+		if ( !plugin_config_get( 'use_updates' ) ||
+			!access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 
@@ -289,7 +297,8 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bugnote ID
 	 */
 	function bugnote_add( $p_event, $p_bug_id, $p_bugnote_id ) {
-		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+		if ( !plugin_config_get( 'use_updates' ) ||
+			!access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 
@@ -307,7 +316,8 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bugnote ID
 	 */
 	function bugnote_edit_form( $p_event, $p_bug_id, $p_bugnote_id ) {
-		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+		if ( !plugin_config_get( 'use_updates' ) ||
+			!access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 		
@@ -326,7 +336,8 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bugnote ID
 	 */
 	function bugnote_edit( $p_event, $p_bug_id, $p_bugnote_id ) {
-		if ( !access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+		if ( !plugin_config_get( 'use_updates' ) ||
+			!access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
 			return;
 		}
 

@@ -27,6 +27,7 @@ maybe_set_option( 'estimate_threshold', gpc_get_int( 'estimate_threshold' ) );
 maybe_set_option( 'update_threshold', gpc_get_int( 'update_threshold' ) );
 maybe_set_option( 'manage_threshold', gpc_get_int( 'manage_threshold' ) );
 
+maybe_set_option( 'use_updates', gpc_get_bool( 'use_updates', OFF ) );
 maybe_set_option( 'use_timecard', gpc_get_bool( 'use_timecard', OFF ) );
 
 form_security_purge( 'plugin_Timecard_config_update' );
