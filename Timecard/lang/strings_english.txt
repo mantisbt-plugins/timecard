@@ -38,6 +38,7 @@ $s_plugin_Timecard_use_timecard = 'Timecard Strings';
 
 $s_plugin_Timecard_timecard_added = 'Timecard Added';
 $s_plugin_Timecard_timecard_updated = 'Timecard Updated';
+$s_plugin_Timecard_timecard_removed = 'Timecard Removed';
 $s_plugin_Timecard_estimate_added = 'Time Estimate Added';
 $s_plugin_Timecard_estimate_updated = 'Time Estimate Updated';
 $s_plugin_Timecard_estimate_removed = 'Time Estimate Removed';

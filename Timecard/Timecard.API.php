@@ -34,7 +34,7 @@ class TimecardBug {
 	function __construct( $p_bug_id, $p_timecard='', $p_estimate=0 ) {
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
 		$this->timecard = $this->__timecard = $p_timecard;
-		$this->estimate = $p_estimate;
+		$this->estimate = $this->__estimate = $p_estimate;
 
 		$this->updates = array();
 	}
@@ -112,7 +112,6 @@ class TimecardBug {
 	 */
 	function save() {
 		$t_estimate_table = plugin_table( 'estimate' );
-		$t_hours = plugin_lang_get( 'hours' );
 
 		if ( $this->new ) {
 			$t_query = "INSERT INTO $t_estimate_table ( bug_id, timecard, estimate ) VALUES (
@@ -124,9 +123,6 @@ class TimecardBug {
 				$this->timecard,
 				$this->estimate,
 			) );
-
-			plugin_history_log( $this->bug_id, 'timecard_added', $this->timecard, '', null, 'Timecard' );
-			plugin_history_log( $this->bug_id, 'estimate_added', $this->estimate . $t_hours, '', null, 'Timecard' );
 		} else {
 			$t_query = "UPDATE $t_estimate_table SET
 				timecard=" . db_param() . ',
@@ -137,15 +133,32 @@ class TimecardBug {
 				$this->estimate,
 				$this->bug_id,
 			) );
+		}
 
-			if ( $this->timecard != $this->__timecard ) {
+		if ( $this->timecard != $this->__timecard ) {
+			if ( $this->__timecard && $this->timecard ) {
 				plugin_history_log( $this->bug_id, 'timecard_updated', $this->__timecard, $this->timecard, null, 'Timecard' );
-				$this->__timecard = $this->timecard;
+
+			} else if ( $this->timecard ) {
+				plugin_history_log( $this->bug_id, 'timecard_added', $this->timecard, '', null, 'Timecard' );
+
+			} else if ( $this->__timecard ) {
+				plugin_history_log( $this->bug_id, 'timecard_removed', $this->__timecard, ' ', null, 'Timecard' );
 			}
-			if ( $this->estimate != $this->__estimate ) {
-				plugin_history_log( $this->bug_id, 'estimate_updated', $this->__estimate . $t_hours, $this->estimate . $t_hours, null, 'Timecard' );
-				$this->__estimate = $this->estimate;
+			$this->__timecard = $this->timecard;
+		}
+
+		if ( $this->estimate != $this->__estimate ) {
+			if ( $this->estimate >= 0 && $this->__estimate >= 0 ) {
+				plugin_history_log( $this->bug_id, 'estimate_updated', $this->__estimate, $this->estimate, null, 'Timecard' );
+
+			} else if ( $this->estimate >= 0 ) {
+				plugin_history_log( $this->bug_id, 'estimate_added', $this->estimate, '', null, 'Timecard' );
+
+			} else if ( $this->__estimate >= 0 ) {
+				plugin_history_log( $this->bug_id, 'estimate_removed', $this->__estimate, ' ', null, 'Timecard' );
 			}
+			$this->__estimate = $this->estimate;
 		}
 
 		foreach ( $this->updates as $t_update ) {
