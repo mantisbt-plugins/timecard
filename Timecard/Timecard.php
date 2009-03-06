@@ -221,6 +221,11 @@ class TimecardPlugin extends MantisPlugin {
 		echo '</tr>';
 	}
 
+	/**
+	 * Show form to update time spent on a bug, separate from a bugnote.
+	 * @param string Event name
+	 * @param int Bug ID
+	 */
 	function view_bug_extra( $p_event, $p_bug_id ) {
 		if ( !plugin_config_get( 'use_updates' ) ||
 			!access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
