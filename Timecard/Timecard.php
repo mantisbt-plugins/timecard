@@ -88,16 +88,17 @@ class TimecardPlugin extends MantisPlugin {
 			return;
 		}
 
+		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
+			'<input type="hidden" name="plugin_timecard" value="1"/>',
+			'</td><td><input name="plugin_timecard_estimate" size="8" maxlength="64"/>',
+			plugin_lang_get( 'hours' ), '</td></tr>';
+
 		if ( plugin_config_get( 'use_timecard' ) ) {
 			$t_project = TimecardProject::load( $p_project_id );
 
 			echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'timecard' ),
-				'</td><td><input name="plugin_timecard" value="', $t_project->timecard, '" size="15" maxlength="64"/></td></tr>';
+				'</td><td><input name="plugin_timecard_string" value="', $t_project->timecard, '" size="15" maxlength="64"/></td></tr>';
 		}
-
-		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
-			'</td><td><input name="plugin_timecard_estimate" value="0" size="8" maxlength="64"/>',
-			plugin_lang_get( 'hours' ), '</td></tr>';
 	}
 
 	/**
@@ -111,11 +112,15 @@ class TimecardPlugin extends MantisPlugin {
 			return;
 		}
 
+		if ( ! gpc_get_bool( 'plugin_timecard', 0 ) ) {
+			return;
+		}
+
 		$t_bug = new TimecardBug( $p_bug_id );
-		$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+		$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', -1 );
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
-			$t_bug->timecard = gpc_get_string( 'plugin_timecard', '' );
+			$t_bug->timecard = gpc_get_string( 'plugin_timecard_string', '' );
 		}
 
 		$t_bug->save();
@@ -135,12 +140,13 @@ class TimecardPlugin extends MantisPlugin {
 		$t_bug = TimecardBug::load( $p_bug_id, true );
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
+			'<input type="hidden" name="plugin_timecard" value="1"/>',
 			'</td><td><input name="plugin_timecard_estimate" value="', $t_bug->estimate, '" size="8" maxlength="64"/>',
 			plugin_lang_get( 'hours' ), '</td>';
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
 			echo '<td class="category">', plugin_lang_get( 'timecard' ),
-				'</td><td><input name="plugin_timecard" value="', $t_bug->timecard,
+				'</td><td><input name="plugin_timecard_string" value="', $t_bug->timecard,
 				'" size="15" maxlength="64"/></td><td colspan="2"></td>';
 		} else {
 			echo '<td colspan="4"></td>';
@@ -160,11 +166,15 @@ class TimecardPlugin extends MantisPlugin {
 			return;
 		}
 
+		if ( ! gpc_get_bool( 'plugin_timecard', 0 ) ) {
+			return;
+		}
+
 		$t_bug = TimecardBug::load( $p_bug_id, true );
-		$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+		$t_bug->estimate = gpc_get_string( 'plugin_timecard_estimate', -1 );
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
-			$t_bug->timecard = gpc_get_string( 'plugin_timecard', '' );
+			$t_bug->timecard = gpc_get_string( 'plugin_timecard_string', '' );
 		}
 
 		$t_bug->save();
@@ -414,7 +424,7 @@ class TimecardPlugin extends MantisPlugin {
 			array( 'CreateTableSQL', array( plugin_table( 'estimate' ), "
 				bug_id			I		NOTNULL UNSIGNED PRIMARY,
 				timecard		C(64)	NOTNULL DEFAULT \" '' \",
-				estimate		I		NOTNULL UNSIGNED DEFAULT '0'
+				estimate		I		NOTNULL DEFAULT '-1'
 				" ) ),
 			array( 'CreateTableSQL', array( plugin_table( 'update' ), "
 				id				I		NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,

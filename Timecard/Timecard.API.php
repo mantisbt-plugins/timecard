@@ -34,7 +34,7 @@ class TimecardBug {
 	function __construct( $p_bug_id, $p_timecard='', $p_estimate=0 ) {
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
 		$this->timecard = $this->__timecard = $p_timecard;
-		$this->estimate = $this->__estimate = $p_estimate < 0 ? 0 : $p_estimate;
+		$this->estimate = $p_estimate;
 
 		$this->updates = array();
 	}
