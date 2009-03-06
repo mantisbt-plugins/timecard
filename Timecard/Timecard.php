@@ -117,7 +117,13 @@ class TimecardPlugin extends MantisPlugin {
 		}
 
 		$t_bug = new TimecardBug( $p_bug_id );
-		$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', -1 );
+		$t_estimate = gpc_get_string( 'plugin_timecard_estimate', '' );
+
+		if ( is_blank( $t_estimate ) ) {
+			$t_bug->estimate = -1;
+		} else {
+			$t_ebug->stimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+		}
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
 			$t_bug->timecard = gpc_get_string( 'plugin_timecard_string', '' );
@@ -171,7 +177,13 @@ class TimecardPlugin extends MantisPlugin {
 		}
 
 		$t_bug = TimecardBug::load( $p_bug_id, true );
-		$t_bug->estimate = gpc_get_string( 'plugin_timecard_estimate', -1 );
+		$t_estimate = gpc_get_string( 'plugin_timecard_estimate', '' );
+
+		if ( !is_numeric( $t_estimate ) ) {
+			$t_bug->estimate = -1;
+		} else {
+			$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+		}
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
 			$t_bug->timecard = gpc_get_string( 'plugin_timecard_string', '' );
@@ -205,7 +217,7 @@ class TimecardPlugin extends MantisPlugin {
 
 		echo '<td class="category">', plugin_lang_get( 'estimate' ), '</td><td colspan="2">';
 
-		if ( $t_bug->estimate > 0 ) {
+		if ( $t_bug->estimate >= 0 ) {
 			if ( plugin_config_get( 'use_updates' ) ) {
 				$t_bug->calculate();
 				if ( $t_bug->spent > $t_bug->estimate ) {
