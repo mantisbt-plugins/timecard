@@ -147,8 +147,8 @@ class TimecardPlugin extends MantisPlugin {
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
 			'<input type="hidden" name="plugin_timecard" value="1"/>',
-			'</td><td><input name="plugin_timecard_estimate" value="', $t_bug->estimate, '" size="8" maxlength="64"/>',
-			plugin_lang_get( 'hours' ), '</td>';
+			'</td><td><input name="plugin_timecard_estimate" value="', ( $t_bug->estimate < 0 ? '' : $t_bug->estimate ),
+			'" size="8" maxlength="64"/>', plugin_lang_get( 'hours' ), '</td>';
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
 			echo '<td class="category">', plugin_lang_get( 'timecard' ),
@@ -209,13 +209,7 @@ class TimecardPlugin extends MantisPlugin {
 		$t_columns = 6;
 		echo '<tr ', helper_alternate_class(), '>';
 
-		if ( plugin_config_get( 'use_timecard' ) ) {
-			echo '<td class="category">', plugin_lang_get( 'timecard' ), '</td><td>',
-				string_display_line( $t_bug->timecard ), '</td>';
-			$t_columns -= 2;
-		}
-
-		echo '<td class="category">', plugin_lang_get( 'estimate' ), '</td><td colspan="2">';
+		echo '<td class="category">', plugin_lang_get( 'estimate' ), '</td><td>';
 
 		if ( $t_bug->estimate >= 0 ) {
 			if ( plugin_config_get( 'use_updates' ) ) {
@@ -234,7 +228,13 @@ class TimecardPlugin extends MantisPlugin {
 
 		echo '</td>';
 
-		$t_columns -= 3;
+		$t_columns -= 2;
+
+		if ( plugin_config_get( 'use_timecard' ) ) {
+			echo '<td class="category">', plugin_lang_get( 'timecard' ), '</td><td>',
+				string_display_line( $t_bug->timecard ), '</td>';
+			$t_columns -= 2;
+		}
 
 		if ( $t_columns > 0 ) {
 			echo '<td colspan="', $t_columns, '"></td>';
