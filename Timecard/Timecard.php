@@ -122,7 +122,7 @@ class TimecardPlugin extends MantisPlugin {
 		if ( is_blank( $t_estimate ) ) {
 			$t_bug->estimate = -1;
 		} else {
-			$t_ebug->stimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+			$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
 		}
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
