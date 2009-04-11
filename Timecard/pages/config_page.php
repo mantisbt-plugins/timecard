@@ -55,6 +55,8 @@ print_manage_menu();
 <tr <?php echo helper_alternate_class() ?>>
 <td class="category"><?php echo plugin_lang_get( 'enabled_features' ) ?></td>
 <td>
+	<label><input type="checkbox" name="use_estimates" <?php echo ( plugin_config_get( 'use_estimates' ) ? 'checked="checked" ' : '' ) ?>/>
+	<?php echo plugin_lang_get( 'use_estimates' ) ?></label><br/>
 	<label><input type="checkbox" name="use_updates" <?php echo ( plugin_config_get( 'use_updates' ) ? 'checked="checked" ' : '' ) ?>/>
 	<?php echo plugin_lang_get( 'use_updates' ) ?></label><br/>
 	<label><input type="checkbox" name="use_timecard" <?php echo ( plugin_config_get( 'use_timecard' ) ? 'checked="checked" ' : '' ) ?>/>

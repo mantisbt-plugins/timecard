@@ -33,6 +33,7 @@ $s_plugin_Timecard_estimate_threshold = 'Estimate Threshold';
 $s_plugin_Timecard_update_threshold = 'Update Threshold';
 $s_plugin_Timecard_manage_threshold = 'Manage Threshold';
 $s_plugin_Timecard_enabled_features = 'Enabled Features';
+$s_plugin_Timecard_use_estimates = 'Time Estimation';
 $s_plugin_Timecard_use_updates = 'Time Spent Updates';
 $s_plugin_Timecard_use_timecard = 'Timecard Strings';
 

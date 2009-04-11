@@ -45,6 +45,7 @@ class TimecardPlugin extends MantisPlugin {
 			'update_threshold' => DEVELOPER,
 			'manage_threshold' => ADMINISTRATOR,
 
+			'use_estimates' => OFF,
 			'use_updates' => ON,
 			'use_timecard' => OFF,
 		);
@@ -84,14 +85,13 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param boolean Advanced view
 	 */
 	function report_bug_form( $p_event, $p_project_id, $p_advanced ) {
-		if ( !access_has_project_level( plugin_config_get( 'estimate_threshold' ), $p_project_id ) ) {
-			return;
+		if ( plugin_config_get( 'use_estimates' ) &&
+		     access_has_project_level( plugin_config_get( 'estimate_threshold' ), $p_project_id ) ) {
+			echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
+				'<input type="hidden" name="plugin_timecard" value="1"/>',
+				'</td><td><input name="plugin_timecard_estimate" size="8" maxlength="64"/>',
+				plugin_lang_get( 'hours' ), '</td></tr>';
 		}
-
-		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
-			'<input type="hidden" name="plugin_timecard" value="1"/>',
-			'</td><td><input name="plugin_timecard_estimate" size="8" maxlength="64"/>',
-			plugin_lang_get( 'hours' ), '</td></tr>';
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
 			$t_project = TimecardProject::load( $p_project_id );
@@ -108,24 +108,27 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bug ID
 	 */
 	function report_bug( $p_event, $p_data, $p_bug_id ) {
-		if ( !access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id ) ) {
-			return;
-		}
+		$t_use_estimates = plugin_config_get( 'use_estimates' ) &&
+			access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id );
+		$t_use_timecard = plugin_config_get( 'use_timecard' );
 
-		if ( ! gpc_get_bool( 'plugin_timecard', 0 ) ) {
+		if ( !( $t_use_estimates || $t_use_timecard ) ) {
 			return;
 		}
 
 		$t_bug = new TimecardBug( $p_bug_id );
-		$t_estimate = gpc_get_string( 'plugin_timecard_estimate', '' );
 
-		if ( is_blank( $t_estimate ) ) {
-			$t_bug->estimate = -1;
-		} else {
-			$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+		if ( $t_use_estimates ) {
+			$t_estimate = gpc_get_string( 'plugin_timecard_estimate', '' );
+
+			if ( is_blank( $t_estimate ) ) {
+				$t_bug->estimate = -1;
+			} else {
+				$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+			}
 		}
 
-		if ( plugin_config_get( 'use_timecard' ) ) {
+		if ( $t_use_timecard ) {
 			$t_bug->timecard = gpc_get_string( 'plugin_timecard_string', '' );
 		}
 
@@ -139,18 +142,27 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param boolean Advanced view
 	 */
 	function update_bug_form( $p_event, $p_bug_id, $p_advanced ) {
-		if ( !access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id ) ) {
+		$t_use_estimates = plugin_config_get( 'use_estimates' ) &&
+			access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id );
+		$t_use_timecard = plugin_config_get( 'use_timecard' );
+
+		if ( !( $t_use_estimates || $t_use_timecard ) ) {
 			return;
 		}
 
 		$t_bug = TimecardBug::load( $p_bug_id, true );
 
-		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'estimate' ),
-			'<input type="hidden" name="plugin_timecard" value="1"/>',
-			'</td><td><input name="plugin_timecard_estimate" value="', ( $t_bug->estimate < 0 ? '' : $t_bug->estimate ),
-			'" size="8" maxlength="64"/>', plugin_lang_get( 'hours' ), '</td>';
+		echo '<tr ', helper_alternate_class(), '>';
 
-		if ( plugin_config_get( 'use_timecard' ) ) {
+		if ( $t_use_estimates ) {
+			echo '<td class="category">', plugin_lang_get( 'estimate' ),
+				'</td><td><input name="plugin_timecard_estimate" value="', ( $t_bug->estimate < 0 ? '' : $t_bug->estimate ),
+				'" size="8" maxlength="64"/>', plugin_lang_get( 'hours' ), '</td>';
+		} else {
+			echo '<td colspan="2"></td>';
+		}
+
+		if ( $t_use_timecard ) {
 			echo '<td class="category">', plugin_lang_get( 'timecard' ),
 				'</td><td><input name="plugin_timecard_string" value="', $t_bug->timecard,
 				'" size="15" maxlength="64"/></td><td colspan="2"></td>';
@@ -168,24 +180,27 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param int Bug ID
 	 */
 	function update_bug( $p_event, $p_data, $p_bug_id ) {
-		if ( !access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id ) ) {
-			return;
-		}
+		$t_use_estimates = plugin_config_get( 'use_estimates' ) &&
+			access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id );
+		$t_use_timecard = plugin_config_get( 'use_timecard' );
 
-		if ( ! gpc_get_bool( 'plugin_timecard', 0 ) ) {
+		if ( !( $t_use_estimates || $t_use_timecard ) ) {
 			return;
 		}
 
 		$t_bug = TimecardBug::load( $p_bug_id, true );
-		$t_estimate = gpc_get_string( 'plugin_timecard_estimate', '' );
 
-		if ( !is_numeric( $t_estimate ) ) {
-			$t_bug->estimate = -1;
-		} else {
-			$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+		if ( $t_use_estimates ) {
+			$t_estimate = gpc_get_string( 'plugin_timecard_estimate', '' );
+
+			if ( !is_numeric( $t_estimate ) ) {
+				$t_bug->estimate = -1;
+			} else {
+				$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+			}
 		}
 
-		if ( plugin_config_get( 'use_timecard' ) ) {
+		if ( $t_use_timecard ) {
 			$t_bug->timecard = gpc_get_string( 'plugin_timecard_string', '' );
 		}
 
@@ -209,26 +224,28 @@ class TimecardPlugin extends MantisPlugin {
 		$t_columns = 6;
 		echo '<tr ', helper_alternate_class(), '>';
 
-		echo '<td class="category">', plugin_lang_get( 'estimate' ), '</td><td>';
+		if ( plugin_config_get( 'use_estimates' ) ) {
+			echo '<td class="category">', plugin_lang_get( 'estimate' ), '</td><td>';
 
-		if ( $t_bug->estimate >= 0 ) {
-			if ( plugin_config_get( 'use_updates' ) ) {
-				$t_bug->calculate();
-				if ( $t_bug->spent > $t_bug->estimate ) {
-					echo sprintf( plugin_lang_get( 'estimate_over' ), $t_bug->estimate, $t_bug->spent - $t_bug->estimate );
+			if ( $t_bug->estimate >= 0 ) {
+				if ( plugin_config_get( 'use_updates' ) ) {
+					$t_bug->calculate();
+					if ( $t_bug->spent > $t_bug->estimate ) {
+						echo sprintf( plugin_lang_get( 'estimate_over' ), $t_bug->estimate, $t_bug->spent - $t_bug->estimate );
+					} else {
+						echo sprintf( plugin_lang_get( 'estimate_display' ), $t_bug->estimate, $t_bug->estimate - $t_bug->spent );
+					}
 				} else {
-					echo sprintf( plugin_lang_get( 'estimate_display' ), $t_bug->estimate, $t_bug->estimate - $t_bug->spent );
+					echo $t_bug->estimate, plugin_lang_get( 'hours' );
 				}
 			} else {
-				echo $t_bug->estimate, plugin_lang_get( 'hours' );
+				echo plugin_lang_get( 'estimate_zero' );
 			}
-		} else {
-			echo plugin_lang_get( 'estimate_zero' );
+
+			echo '</td>';
+
+			$t_columns -= 2;
 		}
-
-		echo '</td>';
-
-		$t_columns -= 2;
 
 		if ( plugin_config_get( 'use_timecard' ) ) {
 			echo '<td class="category">', plugin_lang_get( 'timecard' ), '</td><td>',
