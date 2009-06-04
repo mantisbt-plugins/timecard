@@ -179,7 +179,7 @@ class TimecardPlugin extends MantisPlugin {
 	 * @param object Bug data
 	 * @param int Bug ID
 	 */
-	function update_bug( $p_event, $p_data, $p_bug_id ) {
+	function update_bug( $p_event, $p_bug_data, $p_bug_id ) {
 		$t_use_estimates = plugin_config_get( 'use_estimates' ) &&
 			access_has_bug_level( plugin_config_get( 'estimate_threshold' ), $p_bug_id );
 		$t_use_timecard = plugin_config_get( 'use_timecard' );
@@ -205,6 +205,8 @@ class TimecardPlugin extends MantisPlugin {
 		}
 
 		$t_bug->save();
+
+		return $p_bug_data;
 	}
 
 	/**
