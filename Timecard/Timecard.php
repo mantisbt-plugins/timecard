@@ -75,6 +75,7 @@ class TimecardPlugin extends MantisPlugin {
 			'EVENT_MANAGE_PROJECT_CREATE' => 'project_update',
 			'EVENT_MANAGE_PROJECT_UPDATE_FORM' => 'project_update_form',
 			'EVENT_MANAGE_PROJECT_UPDATE' => 'project_update',
+			'EVENT_MENU_SUMMARY' => 'view_timecard',
 		);
 	}
 
@@ -467,6 +468,10 @@ class TimecardPlugin extends MantisPlugin {
 				spent			I		NOTNULL UNSIGNED
 				" ) ),
 		);
+	}
+
+	function view_timecard(){
+		return '<a href="' . plugin_page('view_timecard') . '">View Timecard</a>';
 	}
 }
 

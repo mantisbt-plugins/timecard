@@ -18,12 +18,21 @@ html_page_top2();
 
 print_manage_menu();
 
-$t_current_project = helper_get_current_project();
+if( 0 == $t_current_project ){ # All Projects selected
 
-if( 0 == $t_current_project ){
-	#@todo replace below to handle ZERO (ie All Projects)
-	echo 'Must select something other than All Projects';
-	die();
+	$t_projects = project_get_all_rows();
+	$t_all_projects = array();
+
+	foreach( $t_projects as $t_project ){
+		$t_all_projects[] = $t_project['id'];
+	}
+
+} else { # Use Current Project plus any Subprojects
+
+	$t_current_project = helper_get_current_project();
+	$t_all_projects = project_hierarchy_get_all_subprojects( $t_current_project );
+	array_unshift( $t_all_projects, $t_current_project );
+
 }
 
 $t_bug_table = db_get_table( 'mantis_bug_table' );
@@ -31,43 +40,38 @@ $t_bug_table = db_get_table( 'mantis_bug_table' );
 echo '<table class="width100" cellspacing="1">';
 
 echo '<tr class="row-category">
-		<td>Bug Id</td>
-		<td>Bug Summary</td>
-		<td>Assigned To</td>
-		<td>Timecard</td>
-		<td>Time Remaining</td>
+		<td>' . lang_get( 'id' ) . '</td>
+		<td>' . lang_get( 'summary' ) . '</td>
+		<td>' . lang_get( 'assigned_to' ) . '</td>
+		<td>' . plugin_lang_get( 'timecard' ) . '</td>
+		<td>' . plugin_lang_get( 'hours_remaining' ) . '</td>
 	</tr>';
 
 $i = 1; #row class selector
 $t_time_sum = 0;
 
-$t_all_projects = project_hierarchy_get_all_subprojects( $t_current_project );
-array_unshift( $t_all_projects,$t_current_project );
-
 foreach( $t_all_projects as $t_all_project ){
 
 	$t_query = "SELECT * FROM $t_bug_table
-			WHERE project_id=" . $t_all_project;
-	$t_result = db_query_bound( $t_query );
+			WHERE project_id=" . db_param();
+	$t_result = db_query_bound( $t_query, array( $t_all_project ) );
 
 	while ( $t_row = db_fetch_array( $t_result ) ) {
 
 		$t_timecard = TimecardBug::load( $t_row['id'] );
-		$t_timecard->summary = substr( $t_row['summary'], 0, 40 );
+		$t_timecard->summary = substr( $t_row['summary'], 0, 60 );
 		$t_timecard->assigned = user_get_name( $t_row['handler_id'] );
 
 		if( $t_timecard->estimate < 0 ){
-			$t_timecard->estimate = 'no estimate';
+			$t_timecard->estimate = plugin_lang_get( 'estimate_zero' );
 			$row_class = 'negative';
 		} else {
 			$t_time_sum += $t_timecard->estimate;
 			$row_class = "row-$i";
 		}
 
-	#@todo implement line below doesn't work properly
-	//print_bug_link( $t_timecard->bug_id )
 		echo "<tr class='$row_class'>
-				<td>" . $t_timecard->bug_id . '</td>' .
+				<td>" , print_bug_link( $t_timecard->bug_id ) , '</td>' .
 				'<td>' . $t_timecard->summary . '</td>
 				<td>' . $t_timecard->assigned . '</td>
 				<td class="center">' . $t_timecard->timecard . '</td>
@@ -77,7 +81,8 @@ foreach( $t_all_projects as $t_all_project ){
 		$i = ($i == 1) ? 2 : 1; #toggle row class selector
 	}
 }
-echo '<tr><td colspan="4" class="right">Total Time Remaining</td><td class="center positive">' . $t_time_sum . '</td></tr>';
+echo '<tr class="spacer"></tr>';
+echo '<tr class="bold"><td colspan="4" class="right">' . plugin_lang_get( 'total_remaining' ) . '</td><td class="center">' . $t_time_sum . '</td></tr>';
 echo '</table>';
 
 ?>
