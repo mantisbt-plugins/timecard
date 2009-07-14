@@ -133,6 +133,7 @@ class TimecardPlugin extends MantisPlugin {
 		}
 
 		$t_bug->save();
+		return $p_data;
 	}
 
 	/**
@@ -366,7 +367,7 @@ class TimecardPlugin extends MantisPlugin {
 			!access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
 			return;
 		}
-		
+
 		$t_update = TimecardUpdate::load_by_bugnote( $p_bugnote_id );
 		if ( $t_update != null ) {
 			echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'time_spent' ),

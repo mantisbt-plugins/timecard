@@ -207,7 +207,7 @@ class TimecardUpdate {
 		$this->bugnote_id = $p_bugnote_id < 0 ? 0 : $p_bugnote_id;
 		$this->user_id = $p_user_id < 0 ? 0 : $p_user_id;
 		$this->spent = $this->__spent = $p_spent < 0 ? 0 : $p_spent;
-		$this->timestamp = db_now();
+		$this->timestamp = date("Y-m-d H:i:s");
 	}
 
 	/**
