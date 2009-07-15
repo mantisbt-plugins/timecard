@@ -14,11 +14,19 @@
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
 html_page_top1( plugin_lang_get( 'title' ) );
+?>
+<style type="text/css">
+.max_width {
+ max-width: 500px
+}
+</style>
+<?php
 html_page_top2();
 
 print_manage_menu();
+$t_current_project = helper_get_current_project();
 
-if( 0 == $t_current_project ){ # All Projects selected
+if( ALL_PROJECTS == $t_current_project ){ # All Projects selected
 
 	$t_projects = project_get_all_rows();
 	$t_all_projects = array();
@@ -29,7 +37,6 @@ if( 0 == $t_current_project ){ # All Projects selected
 
 } else { # Use Current Project plus any Subprojects
 
-	$t_current_project = helper_get_current_project();
 	$t_all_projects = project_hierarchy_get_all_subprojects( $t_current_project );
 	array_unshift( $t_all_projects, $t_current_project );
 
@@ -42,8 +49,10 @@ echo '<table class="width100" cellspacing="1">';
 echo '<tr class="row-category">
 		<td>' . lang_get( 'id' ) . '</td>
 		<td>' . lang_get( 'summary' ) . '</td>
+		<td>' . lang_get( 'status' ) . '</td>
 		<td>' . lang_get( 'assigned_to' ) . '</td>
 		<td>' . plugin_lang_get( 'timecard' ) . '</td>
+		<td> Est. Last Upd</td>
 		<td>' . plugin_lang_get( 'hours_remaining' ) . '</td>
 	</tr>';
 
@@ -59,8 +68,9 @@ foreach( $t_all_projects as $t_all_project ){
 	while ( $t_row = db_fetch_array( $t_result ) ) {
 
 		$t_timecard = TimecardBug::load( $t_row['id'] );
-		$t_timecard->summary = substr( $t_row['summary'], 0, 60 );
+		$t_timecard->summary = $t_row['summary'];
 		$t_timecard->assigned = user_get_name( $t_row['handler_id'] );
+		$t_timecard->status = MantisEnum::getLabel( config_get( 'status_enum_string' ), $t_row['status'] );
 
 		if( $t_timecard->estimate < 0 ){
 			$t_timecard->estimate = plugin_lang_get( 'estimate_zero' );
@@ -72,9 +82,11 @@ foreach( $t_all_projects as $t_all_project ){
 
 		echo "<tr class='$row_class'>
 				<td>" , print_bug_link( $t_timecard->bug_id ) , '</td>' .
-				'<td>' . $t_timecard->summary . '</td>
+				'<td class="max_width">' . $t_timecard->summary . '</td>
+				<td>' . $t_timecard->status . '</td>
 				<td>' . $t_timecard->assigned . '</td>
 				<td class="center">' . $t_timecard->timecard . '</td>
+				<td>' . date( 'Y-m-d H:i:s', $t_timecard->timestamp ) . '</td>
 				<td class="center">' . $t_timecard->estimate . '</td>
 			</tr>';
 
@@ -82,7 +94,7 @@ foreach( $t_all_projects as $t_all_project ){
 	}
 }
 echo '<tr class="spacer"></tr>';
-echo '<tr class="bold"><td colspan="4" class="right">' . plugin_lang_get( 'total_remaining' ) . '</td><td class="center">' . $t_time_sum . '</td></tr>';
+echo '<tr class="bold"><td colspan="6" class="right">' . plugin_lang_get( 'total_remaining' ) . '</td><td class="center">' . $t_time_sum . '</td></tr>';
 echo '</table>';
 
 ?>

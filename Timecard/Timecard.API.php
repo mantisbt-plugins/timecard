@@ -21,6 +21,7 @@ class TimecardBug {
 	public $bug_id;
 	public $timecard;
 	public $estimate;
+	public $timestamp;
 
 	public $updates;
 	public $spent;
@@ -57,6 +58,7 @@ class TimecardBug {
 
 		$t_row = db_fetch_array( $t_result );
 		$t_estimate = new TimecardBug( $t_row['bug_id'], $t_row['timecard'], $t_row['estimate'] );
+		$t_estimate->timestamp = $t_row['timestamp'];
 		$t_estimate->new = false;
 
 		if ( $p_load_updates ) {
@@ -89,6 +91,7 @@ class TimecardBug {
 		while ( $t_row = db_fetch_array( $t_result ) ) {
 			$t_estimate = new TimecardBug( $t_row['bug_id'], $t_row['timecard'], $t_row['estimate'] );
 			$t_estimate->new = false;
+			$t_estimate->timestamp = $t_row['timestamp'];
 
 			if ( $p_load_updates && isset( $t_updates[ $t_row['bug_id'] ] ) ) {
 				$t_estimate->updates = $t_updates[ $t_row['bug_id'] ];
@@ -114,23 +117,27 @@ class TimecardBug {
 		$t_estimate_table = plugin_table( 'estimate', 'Timecard' );
 
 		if ( $this->new ) {
-			$t_query = "INSERT INTO $t_estimate_table ( bug_id, timecard, estimate ) VALUES (
+			$t_query = "INSERT INTO $t_estimate_table ( bug_id, timecard, estimate, timestamp ) VALUES (
 				" . db_param() . ',
+				' . db_param() . ',
 				' . db_param() . ',
 				' . db_param() . ' )';
 			db_query_bound( $t_query, array(
 				$this->bug_id,
 				$this->timecard,
 				$this->estimate,
+				$this->timestamp = db_now(),
 			) );
 		} else {
 			$t_query = "UPDATE $t_estimate_table SET
 				timecard=" . db_param() . ',
-				estimate=' . db_param() . '
+				estimate=' . db_param() . ',
+				timestamp=' . db_param() . '
 				WHERE bug_id=' . db_param();
 			db_query_bound( $t_query, array(
 				$this->timecard,
 				$this->estimate,
+				$this->timestamp = db_now(),
 				$this->bug_id,
 			) );
 		}
@@ -207,7 +214,7 @@ class TimecardUpdate {
 		$this->bugnote_id = $p_bugnote_id < 0 ? 0 : $p_bugnote_id;
 		$this->user_id = $p_user_id < 0 ? 0 : $p_user_id;
 		$this->spent = $this->__spent = $p_spent < 0 ? 0 : $p_spent;
-		$this->timestamp = date("Y-m-d H:i:s");
+		$this->timestamp = db_now();
 	}
 
 	/**

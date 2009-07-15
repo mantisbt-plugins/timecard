@@ -467,6 +467,9 @@ class TimecardPlugin extends MantisPlugin {
 				timestamp		T		NOTNULL,
 				spent			I		NOTNULL UNSIGNED
 				" ) ),
+			array( 'AddColumnSQL', array( plugin_table( 'estimate' ), "
+				timestamp		I		NOTNULL DEFAULT '0'
+				" ) ),
 		);
 	}
 
