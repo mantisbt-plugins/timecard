@@ -25,6 +25,7 @@ $s_plugin_Timecard_estimate_over = '%d hours total (<span class="negative">%d ho
 $s_plugin_Timecard_time_spent = 'Time Spent';
 $s_plugin_Timecard_hours_remaining = 'Hours Remaining';
 $s_plugin_Timecard_total_remaining = 'Total Hours Remaining';
+$s_plugin_Timecard_days_since = 'Days Since Update';
 
 $s_plugin_Timecard_update = 'Update';
 $s_plugin_Timecard_log_time_spent = 'Log Time Spent';

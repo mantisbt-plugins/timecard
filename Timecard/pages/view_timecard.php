@@ -52,8 +52,8 @@ echo '<tr class="row-category">
 		<td>' . lang_get( 'status' ) . '</td>
 		<td>' . lang_get( 'assigned_to' ) . '</td>
 		<td>' . plugin_lang_get( 'timecard' ) . '</td>
-		<td> Est. Last Upd</td>
 		<td>' . plugin_lang_get( 'hours_remaining' ) . '</td>
+		<td>' . plugin_lang_get( 'days_since') . '</td>
 	</tr>';
 
 $i = 1; #row class selector
@@ -70,7 +70,13 @@ foreach( $t_all_projects as $t_all_project ){
 		$t_timecard = TimecardBug::load( $t_row['id'] );
 		$t_timecard->summary = $t_row['summary'];
 		$t_timecard->assigned = user_get_name( $t_row['handler_id'] );
+
+		if( 'user0' == $t_timecard->assigned ){ # When bug not assigned don't print user0
+			$t_timecard->assigned = '';
+		}
+
 		$t_timecard->status = MantisEnum::getLabel( config_get( 'status_enum_string' ), $t_row['status'] );
+		$t_timecard->diff = time_get_diff( $t_timecard->timestamp );
 
 		if( $t_timecard->estimate < 0 ){
 			$t_timecard->estimate = plugin_lang_get( 'estimate_zero' );
@@ -86,15 +92,22 @@ foreach( $t_all_projects as $t_all_project ){
 				<td>' . $t_timecard->status . '</td>
 				<td>' . $t_timecard->assigned . '</td>
 				<td class="center">' . $t_timecard->timecard . '</td>
-				<td>' . date( 'Y-m-d H:i:s', $t_timecard->timestamp ) . '</td>
 				<td class="center">' . $t_timecard->estimate . '</td>
+				<td class="center">' . $t_timecard->diff . '</td>
 			</tr>';
 
 		$i = ($i == 1) ? 2 : 1; #toggle row class selector
 	}
 }
 echo '<tr class="spacer"></tr>';
-echo '<tr class="bold"><td colspan="6" class="right">' . plugin_lang_get( 'total_remaining' ) . '</td><td class="center">' . $t_time_sum . '</td></tr>';
+echo '<tr class="bold"><td colspan="5" class="right">' . plugin_lang_get( 'total_remaining' ) . '</td><td class="center">' . $t_time_sum . '</td></tr>';
 echo '</table>';
+
+function time_get_diff( $p_timestamp ){
+
+	define('ONEDAY', 60 * 60 * 24 );
+
+	return $t_time_diff = (int)((db_now() - $p_timestamp) / ONEDAY );
+}
 
 ?>
