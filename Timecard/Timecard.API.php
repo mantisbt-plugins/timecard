@@ -31,7 +31,7 @@ class TimecardBug {
 	 * @param string Timecard string
 	 * @param int Estimate of hours required
 	 */
-	function __construct( $p_bug_id, $p_timecard='', $p_estimate=0 ) {
+	function __construct( $p_bug_id, $p_timecard='', $p_estimate=-1 ) {
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
 		$this->timecard = $this->__timecard = $p_timecard;
 		$this->estimate = $this->__estimate = $p_estimate;
@@ -45,14 +45,14 @@ class TimecardBug {
 	 * @return object TimecardBug object
 	 */
 	static function load( $p_bug_id, $p_load_updates=true ) {
-		$t_estimate_table = plugin_table( 'estimate' );
+		$t_estimate_table = plugin_table( 'estimate', 'Timecard' );
 
 		$t_query = "SELECT * FROM $t_estimate_table WHERE bug_id=" . db_param();
 		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
 			$t_project = TimecardProject::load( bug_get_field( $p_bug_id, 'project_id' ) );
-			return new TimecardBug( $p_bug_id, $t_project->timecard, 0 );
+			return new TimecardBug( $p_bug_id, $t_project->timecard, -1 );
 		}
 
 		$t_row = db_fetch_array( $t_result );
@@ -80,7 +80,7 @@ class TimecardBug {
 		}
 
 		$t_bug_table = db_get_table( 'mantis_bug_table' );
-		$t_estimate_table = plugin_table( 'estimate' );
+		$t_estimate_table = plugin_table( 'estimate', 'Timecard' );
 
 		$t_query = "SELECT * FROM $t_estimate_table WHERE bug_id IN ( SELECT id FROM $t_bug_table WHERE project_id=" . db_param() . ')';
 		$t_result = db_query_bound( $t_query, array( $p_project_id ) );
@@ -111,7 +111,7 @@ class TimecardBug {
 	 * Save a TimecardBug object to the database.
 	 */
 	function save() {
-		$t_estimate_table = plugin_table( 'estimate' );
+		$t_estimate_table = plugin_table( 'estimate', 'Timecard' );
 
 		if ( $this->new ) {
 			$t_query = "INSERT INTO $t_estimate_table ( bug_id, timecard, estimate ) VALUES (
