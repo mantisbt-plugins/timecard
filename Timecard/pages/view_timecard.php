@@ -44,7 +44,25 @@ if( ALL_PROJECTS == $t_current_project ){ # All Projects selected
 }
 
 $t_bug_table = db_get_table( 'mantis_bug_table' );
+$t_estimate_table = plugin_table( 'estimate' );
 
+$t_time_total = 0;
+$t_projects = join(',', $t_all_projects );
+
+	$t_query = "SELECT sum(est.estimate) AS total FROM $t_bug_table AS bug
+				JOIN $t_estimate_table AS est ON est.bug_id=bug.id
+				WHERE bug.project_id IN (" . $t_projects . ')
+				AND est.estimate > 0';
+
+	$t_result = db_query_bound( $t_query );
+
+	$t_row = db_fetch_array( $t_result );
+	$t_time_total = $t_row['total'];
+
+echo '<table class="width100">
+		<tr class="bold"><td class="center">' . plugin_lang_get( 'total_remaining' ) .
+			': ' . $t_time_total . '</td></tr>
+	  </table><br/>';
 
 echo '<table class="width100" cellspacing="1">';
 
@@ -123,10 +141,7 @@ foreach( $t_all_projects as $t_all_project ){
 echo '</table>';
 
 
-echo '<table class="width100">
-		<tr class="bold"><td class="center">' . plugin_lang_get( 'total_remaining' ) .
-			': ' . $t_time_sum . '</td></tr>
-	  </table><br/>';
+
 
 function time_get_diff( $p_timestamp ){
 
