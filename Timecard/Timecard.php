@@ -76,6 +76,8 @@ class TimecardPlugin extends MantisPlugin {
 			'EVENT_MANAGE_PROJECT_UPDATE_FORM' => 'project_update_form',
 			'EVENT_MANAGE_PROJECT_UPDATE' => 'project_update',
 			'EVENT_MENU_SUMMARY' => 'view_timecard',
+
+			'EVENT_FILTER_COLUMNS' => 'addColumns'
 		);
 	}
 
@@ -472,6 +474,15 @@ class TimecardPlugin extends MantisPlugin {
 
 	function view_timecard(){
 		return '<a href="' . plugin_page('view_timecard') . '">View Timecard</a>';
+	}
+
+	function addColumns() {
+		$result = array();
+		if (plugin_config_get( 'use_estimates' )) {
+			require_once( 'classes/TimecardEstimateColumn.class.php' );
+			$result[] = 'TimecardEstimateColumn';
+		}
+		return $result;
 	}
 }
 
