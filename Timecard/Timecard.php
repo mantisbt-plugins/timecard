@@ -477,12 +477,12 @@ class TimecardPlugin extends MantisPlugin {
 	}
 
 	function add_columns() {
-		$v_result = array();
+		$t_result = array();
 		if ( plugin_config_get( 'use_estimates' ) ) {
 			require_once( 'classes/TimecardEstimateColumn.class.php' );
-			$v_result[] = 'TimecardEstimateColumn';
+			$t_result[] = 'TimecardEstimateColumn';
 		}
-		return $v_result;
+		return $t_result;
 	}
 }
 
