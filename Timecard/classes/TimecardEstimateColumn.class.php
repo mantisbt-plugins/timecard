@@ -24,15 +24,15 @@ class TimecardEstimateColumn extends MantisColumn {
 	public $sortable = false;
 
 	public function __construct() {
-		plugin_push_current('Timecard');
+		plugin_push_current( 'Timecard' );
 
-		$this->title = plugin_lang_get('estimate');
+		$this->title = plugin_lang_get( 'estimate' );
 
 		plugin_pop_current();
 	}
 
 	public function display( $p_bug, $p_columns_target ) {
-		plugin_push_current('Timecard');
+		plugin_push_current( 'Timecard' );
 
 		$p_bug_id = $p_bug->id;
 		$t_bug = TimecardBug::load( $p_bug_id, true );
