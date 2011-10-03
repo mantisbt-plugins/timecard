@@ -22,6 +22,7 @@ class TimecardBug {
 	public $timecard;
 	public $estimate;
 	public $timestamp;
+	public $timestamp_updates;
 
 	public $updates;
 	public $spent;
@@ -30,7 +31,7 @@ class TimecardBug {
 	 * Create a new TimecardBug object.
 	 * @param int Bug ID
 	 * @param string Timecard string
-	 * @param int Estimate of hours required
+	 * @param float Estimate of hours required
 	 */
 	function __construct( $p_bug_id, $p_timecard='', $p_estimate=-1 ) {
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
@@ -187,6 +188,28 @@ class TimecardBug {
 		}
 	}
 
+	/**
+	 * Calculate last timestamp of updates.
+	 */
+	function calculateTimestampUpdates() {
+		$this->load_updates();
+
+		$this->timestamp_updates = $this->timestamp;
+		foreach ( $this->updates as $t_update ) {
+		    if ($t_update->timestamp > $this->timestamp_updates)
+			$this->timestamp_updates = $t_update->timestamp;
+		}
+	}
+	
+	/**
+	 * Get last timestamp of updates.
+	 */
+	function getTimestampUpdates() {
+	    if (is_null($this->timestamp_updates))
+		    $this->calculateTimestampUpdates();
+		return $this->timestamp_updates;
+	}
+	
 }
 
 /**
@@ -340,7 +363,7 @@ class TimecardUpdate {
 				$this->bug_id,
 				$this->bugnote_id,
 				$this->user_id,
-				$this->timestamp,
+				$this->timestamp = db_now(),
 				$this->spent,
 				) );
 

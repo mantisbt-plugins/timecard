@@ -14,7 +14,7 @@
 form_security_validate( 'plugin_Timecard_log_time' );
 
 $f_bug_id = gpc_get_int( 'bug_id' );
-$f_spent = gpc_get_int( 'spent', 0 );
+$f_spent = gpc_get_float( 'spent', 0 );
 
 access_ensure_bug_level( plugin_config_get( 'update_threshold' ), $f_bug_id );
 

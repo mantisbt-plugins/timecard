@@ -105,7 +105,14 @@ foreach( $t_all_projects as $t_all_project ){
 		}
 
 		$t_timecard->status = MantisEnum::getLabel( config_get( 'status_enum_string' ), $t_row['status'] );
-		$t_timecard->diff = time_get_diff( $t_timecard->timestamp );
+		$timestamp = $t_timecard->getTimestampUpdates();
+		if (!empty($timestamp)) {
+		    $t_timecard->diff = time_get_diff( $timestamp );
+		}
+		else
+		{
+		    $t_timecard->diff = plugin_lang_get('unknown');
+		}
 
 		if( $t_timecard->estimate < 0 ){
 			$t_timecard->estimate = plugin_lang_get( 'estimate_zero' );
