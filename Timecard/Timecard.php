@@ -351,7 +351,7 @@ class TimecardPlugin extends MantisPlugin {
 			return;
 		}
 
-		$f_spent = gpc_get_int( 'plugin_timecard_spent', 0 );
+		$f_spent = gpc_get_float( 'plugin_timecard_spent', 0 );
 		if ( $f_spent > 0 ) {
 			$t_update = new TimecardUpdate( $p_bug_id, $p_bugnote_id, auth_get_current_user_id(), $f_spent );
 			$t_update->save();
