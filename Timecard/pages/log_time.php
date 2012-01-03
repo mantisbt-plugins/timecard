@@ -14,12 +14,12 @@
 form_security_validate( 'plugin_Timecard_log_time' );
 
 $f_bug_id = gpc_get_int( 'bug_id' );
-$f_spent = gpc_get_int( 'spent', 0 );
+$f_spent = gpc_get_float( 'spent', 0 );
 
 access_ensure_bug_level( plugin_config_get( 'update_threshold' ), $f_bug_id );
 
 if ( $f_spent > 0 ) {
-	$t_update = new TimecardUpdate( $f_bug_id, 0, auth_get_current_user_cookie(), $f_spent );
+	$t_update = new TimecardUpdate( $f_bug_id, 0, auth_get_current_user_id(), $f_spent );
 	$t_update->save();
 } else {
 	trigger_error( ERROR_GENERIC, ERROR );

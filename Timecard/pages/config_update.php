@@ -30,6 +30,7 @@ maybe_set_option( 'manage_threshold', gpc_get_int( 'manage_threshold' ) );
 maybe_set_option( 'use_estimates', gpc_get_bool( 'use_estimates', OFF ) );
 maybe_set_option( 'use_updates', gpc_get_bool( 'use_updates', OFF ) );
 maybe_set_option( 'use_timecard', gpc_get_bool( 'use_timecard', OFF ) );
+maybe_set_option( 'track_history', gpc_get_bool( 'track_history', OFF ) );
 
 form_security_purge( 'plugin_Timecard_config_update' );
 print_successful_redirect( plugin_page( 'config_page', true ) );

@@ -21,8 +21,8 @@ $s_plugin_Timecard_default_timecard = 'Default Timecard';
 $s_plugin_Timecard_timecard = 'Timecard';
 $s_plugin_Timecard_estimate = 'Zeitschätzung';
 $s_plugin_Timecard_estimate_zero = 'Keine Zeitschätzung';
-$s_plugin_Timecard_estimate_display = '%d Stunden total (%d Stunden verbleiben)';
-$s_plugin_Timecard_estimate_over = '%d Stunden total (<span class="negative">%d Stunden überschritten</span>)';
+$s_plugin_Timecard_estimate_display = '%01.2f Stunden total ((%01.2f Stunden verbleiben)';
+$s_plugin_Timecard_estimate_over = '%01.2f Stunden total (<span class="negative">%01.2f Stunden überschritten</span>)';
 $s_plugin_Timecard_time_spent = 'Verbrauchte Zeit';
 $s_plugin_Timecard_hours_remaining = 'Verbleibende Stunden';
 $s_plugin_Timecard_total_remaining = 'Gesamte verbleibende Stunden';
@@ -41,6 +41,7 @@ $s_plugin_Timecard_enabled_features = 'Aktivierte Funktionen';
 $s_plugin_Timecard_use_estimates = 'Zeitschätzung';
 $s_plugin_Timecard_use_updates = 'Verbrauchte Zeit Updates';
 $s_plugin_Timecard_use_timecard = 'Timecard Strings';
+$s_plugin_Timecard_track_history = 'Trackaufzeichnung';
 
 $s_plugin_Timecard_timecard_added = 'Timecard Added';
 $s_plugin_Timecard_timecard_updated = 'Timecard Updated';
@@ -51,4 +52,4 @@ $s_plugin_Timecard_estimate_removed = 'Zeitschätzung entfernt';
 $s_plugin_Timecard_time_spent_added = 'Verbrauchte Zeit hinzugefügt';
 $s_plugin_Timecard_time_spent_updated = 'Verbrauchte Zeit aktualisiert';
 $s_plugin_Timecard_time_spent_removed = 'Verbrauchte Zeit entfernt';
-
+$s_plugin_Timecard_unknown = 'Unbekannt';

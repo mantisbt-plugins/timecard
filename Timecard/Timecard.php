@@ -48,6 +48,7 @@ class TimecardPlugin extends MantisPlugin {
 			'use_estimates' => OFF,
 			'use_updates' => ON,
 			'use_timecard' => OFF,
+			'track_history' => ON,
 		);
 	}
 
@@ -126,7 +127,7 @@ class TimecardPlugin extends MantisPlugin {
 			if ( is_blank( $t_estimate ) ) {
 				$t_bug->estimate = -1;
 			} else {
-				$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+				$t_bug->estimate = gpc_get_float( 'plugin_timecard_estimate', 0 );
 			}
 		}
 
@@ -193,12 +194,14 @@ class TimecardPlugin extends MantisPlugin {
 		$t_bug = TimecardBug::load( $p_bug_id, true );
 
 		if ( $t_use_estimates ) {
-			$t_estimate = gpc_get_string( 'plugin_timecard_estimate', '' );
+			$t_estimate = gpc_get_float( 'plugin_timecard_estimate', '' );
 
-			if ( !is_numeric( $t_estimate ) ) {
-				$t_bug->estimate = -1;
+			if ( !is_float( $t_estimate ) ) {
+			    if (gpc_isset($t_estimate)) {
+				    $t_bug->estimate = -1;
+				}
 			} else {
-				$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+				$t_bug->estimate = gpc_get_float( 'plugin_timecard_estimate', 0 );
 			}
 		}
 
@@ -349,7 +352,7 @@ class TimecardPlugin extends MantisPlugin {
 			return;
 		}
 
-		$f_spent = gpc_get_int( 'plugin_timecard_spent', 0 );
+		$f_spent = gpc_get_float( 'plugin_timecard_spent', 0 );
 		if ( $f_spent > 0 ) {
 			$t_update = new TimecardUpdate( $p_bug_id, $p_bugnote_id, auth_get_current_user_id(), $f_spent );
 			$t_update->save();
@@ -389,7 +392,7 @@ class TimecardPlugin extends MantisPlugin {
 		}
 
 		$f_update_id = gpc_get_int( 'plugin_timecard_id', 0 );
-		$f_spent = gpc_get_int( 'plugin_timecard_spent', 0 );
+		$f_spent = gpc_get_float( 'plugin_timecard_spent', 0 );
 
 		if ( $f_update_id > 0 ) {
 			$t_update = TimecardUpdate::load( $f_update_id );
@@ -469,6 +472,15 @@ class TimecardPlugin extends MantisPlugin {
 			array( 'AddColumnSQL', array( plugin_table( 'estimate' ), "
 				timestamp		I		NOTNULL DEFAULT '0'
 				" ) ),
+    		array( 'AlterColumnSQL', array( plugin_table( 'estimate' ), "
+    			estimate		F(15,2) NOTNULL DEFAULT '0'
+    			" ) ),
+        	array( 'AlterColumnSQL', array( plugin_table( 'update' ), "
+        		spent		F(15,2)     NOTNULL DEFAULT '0'
+        		" ) ),
+            array( 'AlterColumnSQL', array( plugin_table( 'update' ), "
+            	timestamp		I       NOTNULL DEFAULT '0'
+            	" ) ),
 		);
 	}
 
@@ -484,5 +496,38 @@ class TimecardPlugin extends MantisPlugin {
 		}
 		return $t_result;
 	}
+}
+
+/**
+ * Retrieve an integer GPC variable. Uses gpc_get().
+ * If you pass in *no* default, an error will be triggered if
+ * the variable does not exist
+ * @param string $p_var_name
+ * @param float $p_default (optional)
+ * @return float|null
+ */
+function gpc_get_float( $p_var_name, $p_default = null ) {
+    # Don't pass along a default unless one was given to us
+    #  otherwise we prevent an error being triggered
+    $args = func_get_args();
+    $t_result = call_user_func_array( 'gpc_get', $args );
+
+    if( is_array( $t_result ) ) {
+            error_parameters( $p_var_name );
+            trigger_error( ERROR_GPC_ARRAY_UNEXPECTED, ERROR );
+    }
+    $t_val = str_replace( ' ', '', trim( $t_result ) );
+    $t_val = str_replace( ',', '.', trim( $t_result ) );
+    
+    if ($t_val != (string)(float)$t_val) {
+            if (!is_null($p_default) && $p_default === $t_val)
+            {
+                return $t_val;
+            }
+            error_parameters( $p_var_name );
+            trigger_error( ERROR_GPC_NOT_NUMBER, ERROR );
+    }
+
+    return (float) $t_val;    
 }
 

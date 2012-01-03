@@ -22,6 +22,7 @@ class TimecardBug {
 	public $timecard;
 	public $estimate;
 	public $timestamp;
+	public $timestamp_updates;
 
 	public $updates;
 	public $spent;
@@ -30,7 +31,7 @@ class TimecardBug {
 	 * Create a new TimecardBug object.
 	 * @param int Bug ID
 	 * @param string Timecard string
-	 * @param int Estimate of hours required
+	 * @param float Estimate of hours required
 	 */
 	function __construct( $p_bug_id, $p_timecard='', $p_estimate=-1 ) {
 		$this->bug_id = $p_bug_id < 0 ? 0 : $p_bug_id;
@@ -143,27 +144,31 @@ class TimecardBug {
 		}
 
 		if ( $this->timecard != $this->__timecard ) {
-			if ( $this->__timecard && $this->timecard ) {
-				plugin_history_log( $this->bug_id, 'timecard_updated', $this->__timecard, $this->timecard, null, 'Timecard' );
+			if ( plugin_config_get( 'track_history' ) ) {
+				if ( $this->__timecard && $this->timecard ) {
+					plugin_history_log( $this->bug_id, 'timecard_updated', $this->__timecard, $this->timecard, null, 'Timecard' );
 
-			} else if ( $this->timecard ) {
-				plugin_history_log( $this->bug_id, 'timecard_added', $this->timecard, '', null, 'Timecard' );
+				} else if ( $this->timecard ) {
+					plugin_history_log( $this->bug_id, 'timecard_added', $this->timecard, '', null, 'Timecard' );
 
-			} else if ( $this->__timecard ) {
-				plugin_history_log( $this->bug_id, 'timecard_removed', $this->__timecard, ' ', null, 'Timecard' );
+				} else if ( $this->__timecard ) {
+					plugin_history_log( $this->bug_id, 'timecard_removed', $this->__timecard, ' ', null, 'Timecard' );
+				}
 			}
 			$this->__timecard = $this->timecard;
 		}
 
 		if ( $this->estimate != $this->__estimate ) {
-			if ( $this->estimate >= 0 && $this->__estimate >= 0 ) {
-				plugin_history_log( $this->bug_id, 'estimate_updated', $this->__estimate, $this->estimate, null, 'Timecard' );
+			if ( plugin_config_get( 'track_history' ) ) {
+				if ( $this->estimate >= 0 && $this->__estimate >= 0 ) {
+					plugin_history_log( $this->bug_id, 'estimate_updated', $this->__estimate, $this->estimate, null, 'Timecard' );
 
-			} else if ( $this->estimate >= 0 ) {
-				plugin_history_log( $this->bug_id, 'estimate_added', $this->estimate, '', null, 'Timecard' );
+				} else if ( $this->estimate >= 0 ) {
+					plugin_history_log( $this->bug_id, 'estimate_added', $this->estimate, '', null, 'Timecard' );
 
-			} else if ( $this->__estimate >= 0 ) {
-				plugin_history_log( $this->bug_id, 'estimate_removed', $this->__estimate, ' ', null, 'Timecard' );
+				} else if ( $this->__estimate >= 0 ) {
+					plugin_history_log( $this->bug_id, 'estimate_removed', $this->__estimate, ' ', null, 'Timecard' );
+				}
 			}
 			$this->__estimate = $this->estimate;
 		}
@@ -187,6 +192,28 @@ class TimecardBug {
 		}
 	}
 
+	/**
+	 * Calculate last timestamp of updates.
+	 */
+	function calculateTimestampUpdates() {
+		$this->load_updates();
+
+		$this->timestamp_updates = $this->timestamp;
+		foreach ( $this->updates as $t_update ) {
+		    if ($t_update->timestamp > $this->timestamp_updates)
+			$this->timestamp_updates = $t_update->timestamp;
+		}
+	}
+	
+	/**
+	 * Get last timestamp of updates.
+	 */
+	function getTimestampUpdates() {
+	    if (is_null($this->timestamp_updates))
+		    $this->calculateTimestampUpdates();
+		return $this->timestamp_updates;
+	}
+	
 }
 
 /**
@@ -340,13 +367,15 @@ class TimecardUpdate {
 				$this->bug_id,
 				$this->bugnote_id,
 				$this->user_id,
-				$this->timestamp,
+				$this->timestamp = db_now(),
 				$this->spent,
 				) );
 
 			$this->id = db_insert_id( $t_update_table );
 
-			plugin_history_log( $this->bug_id, 'time_spent_added', $this->spent . $t_hours, '', null, 'Timecard' );
+			if ( plugin_config_get( 'track_history' ) ) {
+				plugin_history_log( $this->bug_id, 'time_spent_added', $this->spent . $t_hours, '', null, 'Timecard' );
+			}
 
 		} else { #existing
 			$t_query = "UPDATE $t_update_table SET
@@ -367,7 +396,9 @@ class TimecardUpdate {
 				) );
 
 			if ( $this->spent != $this->__spent ) {
-				plugin_history_log( $this->bug_id, 'time_spent_updated', $this->__spent . $t_hours, $this->spent . $t_hours, null, 'Timecard' );
+				if ( plugin_config_get( 'track_history' ) ) {
+					plugin_history_log( $this->bug_id, 'time_spent_updated', $this->__spent . $t_hours, $this->spent . $t_hours, null, 'Timecard' );
+				}
 				$this->__spent = $this->spent;
 			}
 		}
@@ -380,7 +411,9 @@ class TimecardUpdate {
 		$t_query = "DELETE FROM $t_update_table WHERE id=" . db_param();
 		db_query_bound( $t_query, array( $this->id ) );
 
-		plugin_history_log( $this->bug_id, 'time_spent_removed', $this->__spent . $t_hours, '', null, 'Timecard' );
+		if ( plugin_config_get( 'track_history' ) ) {
+			plugin_history_log( $this->bug_id, 'time_spent_removed', $this->__spent . $t_hours, '', null, 'Timecard' );
+		}
 		$this->id = 0;
 	}
 }
