@@ -41,6 +41,7 @@ $s_plugin_Timecard_enabled_features = 'Aktivierte Funktionen';
 $s_plugin_Timecard_use_estimates = 'Zeitschätzung';
 $s_plugin_Timecard_use_updates = 'Verbrauchte Zeit Updates';
 $s_plugin_Timecard_use_timecard = 'Timecard Strings';
+$s_plugin_Timecard_track_history = 'Trackaufzeichnung';
 
 $s_plugin_Timecard_timecard_added = 'Timecard Added';
 $s_plugin_Timecard_timecard_updated = 'Timecard Updated';

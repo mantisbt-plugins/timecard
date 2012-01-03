@@ -48,6 +48,7 @@ class TimecardPlugin extends MantisPlugin {
 			'use_estimates' => OFF,
 			'use_updates' => ON,
 			'use_timecard' => OFF,
+			'track_history' => ON,
 		);
 	}
 
