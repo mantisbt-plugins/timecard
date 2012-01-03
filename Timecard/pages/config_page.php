@@ -61,6 +61,8 @@ print_manage_menu();
 	<?php echo plugin_lang_get( 'use_updates' ) ?></label><br/>
 	<label><input type="checkbox" name="use_timecard" <?php echo ( plugin_config_get( 'use_timecard' ) ? 'checked="checked" ' : '' ) ?>/>
 	<?php echo plugin_lang_get( 'use_timecard' ) ?></label><br/>
+	<label><input type="checkbox" name="track_history" <?php echo ( plugin_config_get( 'track_history' ) ? 'checked="checked" ' : '' ) ?>/>
+	<?php echo plugin_lang_get( 'track_history' ) ?></label><br/>
 </td>
 </tr>
 
