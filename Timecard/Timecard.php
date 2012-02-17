@@ -193,12 +193,15 @@ class TimecardPlugin extends MantisPlugin {
 		$t_bug = TimecardBug::load( $p_bug_id, true );
 
 		if ( $t_use_estimates ) {
-			$t_estimate = gpc_get_string( 'plugin_timecard_estimate', '' );
+			// not every form shows the estimate input field
+			if ( array_key_exists( 'plugin_timecard_estimate', $_REQUEST ) ) {
+				$t_estimate = gpc_get_string( 'plugin_timecard_estimate', '' );
 
-			if ( !is_numeric( $t_estimate ) ) {
-				$t_bug->estimate = -1;
-			} else {
-				$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+				if ( !is_numeric( $t_estimate ) ) {
+					$t_bug->estimate = -1;
+				} else {
+					$t_bug->estimate = gpc_get_int( 'plugin_timecard_estimate', 0 );
+				}
 			}
 		}
 
