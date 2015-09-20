@@ -1,17 +1,4 @@
 <?php
-# Copyright (C) 2008	John Reese
-# Copyright (C) 2011	Reinhard Holler
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
 $s_plugin_Timecard_ = '';
 $s_plugin_Timecard_title = 'Timecard';
 $s_plugin_Timecard_description = 'Zeitverfolgung für Tickets und Projekte in MantisBT.';
@@ -21,11 +8,11 @@ $s_plugin_Timecard_default_timecard = 'Default Timecard';
 $s_plugin_Timecard_timecard = 'Timecard';
 $s_plugin_Timecard_estimate = 'Zeitschätzung';
 $s_plugin_Timecard_estimate_zero = 'Keine Zeitschätzung';
-$s_plugin_Timecard_estimate_display = '%d Stunden total (%d Stunden verbleiben)';
-$s_plugin_Timecard_estimate_over = '%d Stunden total (<span class="negative">%d Stunden überschritten</span>)';
+$s_plugin_Timecard_estimate_display = '%d Stunden gesamt (%d Stunden verbleiben)';
+$s_plugin_Timecard_estimate_over = '%d Stunden gesamt (<span class="negative">%d Stunden überschritten</span>)';
 $s_plugin_Timecard_time_spent = 'Verbrauchte Zeit';
 $s_plugin_Timecard_hours_remaining = 'Verbleibende Stunden';
-$s_plugin_Timecard_total_remaining = 'Gesamte verbleibende Stunden';
+$s_plugin_Timecard_total_remaining = 'Verbleibende Stunden Gesamt';
 $s_plugin_Timecard_days_since = 'Tage seit Aktualisierung';
 $s_plugin_Timecard_hours_spent = 'Verbrauchte Stunden';
 
@@ -33,18 +20,18 @@ $s_plugin_Timecard_update = 'Speichern';
 $s_plugin_Timecard_log_time_spent = 'Verbrauchte Zeit notieren';
 
 $s_plugin_Timecard_configuration = 'Konfiguration';
-$s_plugin_Timecard_view_threshold = 'View Threshold';
-$s_plugin_Timecard_estimate_threshold = 'Estimate Threshold';
-$s_plugin_Timecard_update_threshold = 'Update Threshold';
-$s_plugin_Timecard_manage_threshold = 'Manage Threshold';
+$s_plugin_Timecard_view_threshold = 'Schwellwerte anzeigen';
+$s_plugin_Timecard_estimate_threshold = 'Schätzschwelle';
+$s_plugin_Timecard_update_threshold = 'Schwellwert berbeiten';
+$s_plugin_Timecard_manage_threshold = 'Schwellwerte verwalten';
 $s_plugin_Timecard_enabled_features = 'Aktivierte Funktionen';
 $s_plugin_Timecard_use_estimates = 'Zeitschätzung';
 $s_plugin_Timecard_use_updates = 'Verbrauchte Zeit Updates';
 $s_plugin_Timecard_use_timecard = 'Timecard Strings';
 
-$s_plugin_Timecard_timecard_added = 'Timecard Added';
-$s_plugin_Timecard_timecard_updated = 'Timecard Updated';
-$s_plugin_Timecard_timecard_removed = 'Timecard Removed';
+$s_plugin_Timecard_timecard_added = 'Timecard hinzugefügt';
+$s_plugin_Timecard_timecard_updated = 'Timecard aktualisiert';
+$s_plugin_Timecard_timecard_removed = 'Timecard entfernt';
 $s_plugin_Timecard_estimate_added = 'Zeitschätzung hinzugefügt';
 $s_plugin_Timecard_estimate_updated = 'Zeitschätzung aktualisiert';
 $s_plugin_Timecard_estimate_removed = 'Zeitschätzung entfernt';
